@@ -74,7 +74,7 @@ namespace Presec
                     regex = string.Format(".*{0}^d*{1}^d.*", spts[0], spts[1]);
                 }
 
-                using (var db = Mongo.Create("mongodb://baio:elect2012@ds029847.mongolab.com:29847/elect-moscow"))
+                using (var db = Mongo.Create("mongodb://baio:election2012@ds029847.mongolab.com:29847/elect-moscow"))
                 {
                     var col = db.GetCollection<Doc>("moscow");
 
@@ -92,7 +92,7 @@ namespace Presec
 
                         st.station = new Address
                         {
-                            line = p.station.addr,
+                            addr = p.station.addr,
                             aux = p.station.aux,
                             org = p.station.org,
                             phone = p.station.phone,
@@ -101,7 +101,7 @@ namespace Presec
 
                         st.uik = new Address
                         {
-                            line = p.uik.addr,
+                            addr = p.uik.addr,
                             aux = p.uik.aux,
                             org = p.uik.org,
                             phone = p.station.phone,

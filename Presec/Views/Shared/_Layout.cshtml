@@ -19,7 +19,10 @@
     <script src="@Url.Content("~/Scripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/jquery-ui-1.8.17.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/bootstrap/js/bootstrap.min.js")" type="text/javascript"></script>
-
+    <script src="@Url.Content("~/Scripts/datajs-1.0.2.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/knockout-2.0.0.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/knockout.mapping.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/proj.find.js")" type="text/javascript"></script>
 </head>
 <body>
     <div class="navbar navbar-fixed-top">
@@ -50,25 +53,32 @@
                         <li>
                             <form class="form-search" action="">
                             <div class="row-fluid">
-                                <input type="text" class="search-query span11" placeholder="улица, дом" />
+                                <input id="search_field" type="text" class="search-query span11" placeholder="улица, дом" value="винокур"/>
                             </div>
                             <div class="row-fluid">
-                                <a href="#" class="btn btn-small btn-primary" style="margin-top: 3px;"><i class="icon-search icon-white"></i>Поиск</a>
+                                <a id="search_button" href="#" class="btn btn-small btn-primary" style="margin-top: 3px;"><i class="icon-search icon-white"></i>Поиск</a>
                             </div>
                             </form>
                         </li>
+                        <!-- ko with : first -->
                         <li class="nav-header">Ваш аддресс</li>
                         <li>111 222 333</li>
                         <li class="nav-header">Ваш избирательный участок</li>
-                        <li>Номер: 1111</li>
-                        <li>Аддресс: 1111</li>
-                        <li>Телефон: 1111</li>
-                        <li>Дополнительно: 1111</li>
+                        <li>Номер: <span data-bind="text: id"></span></li>
+                        <!-- ko with : station -->
+                        <li>Аддресс: <span data-bind="text: addr"></span></li>
+                        <li>Телефон: <span data-bind="text: phone"></span></li>
+                        <li>Организация: <span data-bind="text: org"></span></li>
+                        <li>Дополнительно: <span data-bind="text: aux"></span></li>
+                        <!-- /ko -->
                         <li class="nav-header">Ваш УИК</li>
-                        <li>Номер: 1111</li>
-                        <li>Аддресс: 1111</li>
-                        <li>Телефон: 1111</li>
-                        <li>Дополнительно: 1111</li>
+                        <!-- ko with : uik -->
+                        <li>Аддресс: <span data-bind="text: addr"></span></li>
+                        <li>Телефон: <span data-bind="text: phone"></span></li>
+                        <li>Организация: <span data-bind="text: org"></span></li>
+                        <li>Дополнительно: <span data-bind="text: aux"></span></li>
+                        <!-- /ko -->
+                        <!-- /ko -->
                         <li class="nav-header">Участки рядом</li>
                         <li>1111, аддресс</li>
                         <li>2222, аддресс</li>

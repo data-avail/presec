@@ -23,37 +23,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="main.coffee" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/App/main.coffee">
+      <file leaf-file-name="proj.find.coffee" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/proj.find.coffee">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="5" column="0" selection-start="187" selection-end="187" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="router.coffee" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/App/router.coffee">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="6" selection-start="692" selection-end="692" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="find.coffee" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/App/Models/find.coffee">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="0" selection-start="285" selection-end="285" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="addr.coffee" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/App/Models/addr.coffee">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="13" selection-start="403" selection-end="403" vertical-scroll-proportion="0.2712766">
+            <state line="16" column="5" selection-start="503" selection-end="503" vertical-scroll-proportion="0.4822695">
               <folding />
             </state>
           </provider>
@@ -83,6 +56,7 @@
         <option value="$PROJECT_DIR$/App/Bindings/ymap.bindings.coffee" />
         <option value="$PROJECT_DIR$/App/Models/addr.coffee" />
         <option value="$PROJECT_DIR$/App/Models/find.coffee" />
+        <option value="$PROJECT_DIR$/proj.find.coffee" />
       </list>
     </option>
   </component>
@@ -161,24 +135,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="Models" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Scripts" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Scripts" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="App" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Controllers" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -309,11 +265,6 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/App/Views/Find/index.hbs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/App/Views/Find/_tool.hbs">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
@@ -373,16 +324,23 @@
         <state line="0" column="9" selection-start="9" selection-end="9" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/App/main.coffee">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="0" selection-start="187" selection-end="187" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/App/router.coffee">
       <provider selected="true" editor-type-id="text-editor">
         <state line="23" column="6" selection-start="692" selection-end="692" vertical-scroll-proportion="0.0">
           <folding />
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/App/Models/addr.coffee">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="13" selection-start="403" selection-end="403" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/App/main.coffee">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="0" selection-start="187" selection-end="187" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/App/Models/find.coffee">
@@ -392,9 +350,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/App/Models/addr.coffee">
+    <entry file="file://$PROJECT_DIR$/proj.find.coffee">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="13" selection-start="403" selection-end="403" vertical-scroll-proportion="0.2712766">
+        <state line="16" column="5" selection-start="503" selection-end="503" vertical-scroll-proportion="0.4822695">
           <folding />
         </state>
       </provider>

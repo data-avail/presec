@@ -23,7 +23,7 @@ namespace Presec.Models.ServiceModels
     [DataServiceKey("line", "building")]
     public class Address
     {
-        public string line { get; set; }
+        public string addr { get; set; }
 
         public string org { get; set; }
 

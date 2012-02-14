@@ -137,16 +137,35 @@
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Global.asax" />
     <Content Include="README.jQuery.vsdoc.txt" />
+    <Content Include="Scripts\App\Bindings\ymap.bindings.js" />
+    <Content Include="Scripts\App\Controllers\controller.js" />
+    <Content Include="Scripts\App\Controllers\findController.js" />
+    <Content Include="Scripts\App\Handlebars.js" />
+    <Content Include="Scripts\App\hbs.js" />
+    <Content Include="Scripts\App\json2.js" />
+    <Content Include="Scripts\App\main.js" />
+    <Content Include="Scripts\App\Models\addr.js" />
+    <Content Include="Scripts\App\Models\find.js" />
+    <Content Include="Scripts\App\router.js" />
+    <Content Include="Scripts\App\text.js" />
+    <Content Include="Scripts\App\underscore.js" />
     <Content Include="Scripts\jquery-1.7.1-vsdoc.js" />
     <Content Include="Scripts\jquery-1.7.1.js" />
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <Content Include="Scripts\jquery-ui-1.8.17.js" />
     <Content Include="Scripts\jquery-ui-1.8.17.min.js" />
+    <Content Include="Scripts\jquery.tmpl.js" />
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\knockout-2.0.0.debug.js" />
+    <Content Include="Scripts\knockout-2.0.0.js" />
+    <Content Include="Scripts\knockout.mapping.js" />
+    <Content Include="Scripts\knockout.validation.js" />
+    <Content Include="Scripts\knockout.validation.min.js" />
     <Content Include="Scripts\modernizr-1.7.js" />
     <Content Include="Scripts\modernizr-1.7.min.js" />
+    <Content Include="Scripts\require.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -182,6 +201,42 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_Body.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\App\Bindings\ymap.bindings.coffee">
+      <Generator>CoffeeScriptGenerator</Generator>
+      <LastGenOutput>ymap.bindings1.js</LastGenOutput>
+    </None>
+    <None Include="Scripts\App\Controllers\controller.coffee">
+      <Generator>CoffeeScriptGenerator</Generator>
+      <LastGenOutput>controller1.js</LastGenOutput>
+    </None>
+    <None Include="Scripts\App\Controllers\findController.coffee">
+      <Generator>CoffeeScriptGenerator</Generator>
+      <LastGenOutput>findController1.js</LastGenOutput>
+    </None>
+    <None Include="Scripts\App\main.coffee">
+      <Generator>CoffeeScriptGenerator</Generator>
+      <LastGenOutput>main1.js</LastGenOutput>
+    </None>
+    <None Include="Scripts\App\Models\addr.coffee">
+      <Generator>CoffeeScriptGenerator</Generator>
+      <LastGenOutput>addr1.js</LastGenOutput>
+    </None>
+    <None Include="Scripts\App\Models\find.coffee">
+      <Generator>CoffeeScriptGenerator</Generator>
+      <LastGenOutput>find1.js</LastGenOutput>
+    </None>
+    <None Include="Scripts\App\README.md" />
+    <None Include="Scripts\App\router.coffee">
+      <Generator>CoffeeScriptGenerator</Generator>
+      <LastGenOutput>router1.js</LastGenOutput>
+    </None>
+    <None Include="Scripts\App\Views\Find\index.hbs" />
+    <None Include="Scripts\App\Views\Find\_tool.hbs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

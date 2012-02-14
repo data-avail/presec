@@ -11,4 +11,4 @@ ko.bindingHandlers.ymap =
     map.setCenter new YMaps.GeoPoint(pos.longitude, pos.latitude), zoom
     YMaps.Events.observe map, map.Events.BoundsChange, (object) -> @_refresh mapView
     @_refresh mapView
-  _refresh: (mapView) ->
+  _refresh: (mapView) -

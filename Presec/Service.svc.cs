@@ -6,6 +6,10 @@ using System.Linq;
 using System.ServiceModel.Web;
 using System.Web;
 using Microsoft.Data.Services.Toolkit.QueryModel;
+using Norm;
+using System.Text.RegularExpressions;
+using Presec.Models.ServiceModels;
+using Presec.Models.MongoModels;
 
 namespace Presec
 {
@@ -21,7 +25,7 @@ namespace Presec
             config.DataServiceBehavior.MaxProtocolVersion = DataServiceProtocolVersion.V2;
         }
     }
-    
+
 
     public class CustomDataServiceProvider : ODataContext
     {
@@ -42,22 +46,74 @@ namespace Presec
         }
     }
 
-    [DataServiceKey("Id")]
-    public class Station
-    {
-        public int Id { get; set; }
-    }
 
-    public class StationRepository 
+
+    public class StationRepository
     {
         public Station GetOne(string id)
         {
-            return new Station { Id = 0 };
+            return new Station { id = 0 };
         }
 
         public IEnumerable<Station> GetAll(ODataQueryOperation operation)
         {
-            return new[] { new Station { Id = 0 } };
+            var addr = operation.ContextParameters["addr"];
+
+            if (!string.IsNullOrEmpty(addr))
+            {
+                var spts = addr.Split(',');
+
+                string regex = null;
+
+                if (spts.Count() == 1)
+                {
+                    regex = string.Format(".*{0}.*", spts[0].Trim());
+                }
+                else
+                {
+                    regex = string.Format(".*{0}^d*{1}^d.*", spts[0], spts[1]);
+                }
+
+                using (var db = Mongo.Create("mongodb://baio:elect2012@ds029847.mongolab.com:29847/elect-moscow"))
+                {
+                    var col = db.GetCollection<Doc>("moscow");
+
+                    var q = col.AsQueryable().Where(p => p.boundary.Any(s => Regex.IsMatch(s, regex, RegexOptions.IgnoreCase)));
+
+
+                    return q.ToArray().Select((p) =>
+                    {
+                        var st = new Station
+                        {
+                            id = p._id
+                        };
+
+                        st.limits = string.Join("|", p.boundary);
+
+                        st.station = new Address
+                        {
+                            line = p.station.addr,
+                            aux = p.station.aux,
+                            org = p.station.org,
+                            phone = p.station.phone,
+                            geo = p.station.geo != null ? new GeoPoint { lat = p.station.geo[0], lon = p.station.geo[1] } : null
+                        };
+
+                        st.uik = new Address
+                        {
+                            line = p.uik.addr,
+                            aux = p.uik.aux,
+                            org = p.uik.org,
+                            phone = p.station.phone,
+                            geo = p.uik.geo != null ? new GeoPoint { lat = p.uik.geo[0], lon = p.uik.geo[1] } : null
+                        };
+
+                        return st;
+                    });
+                }
+            }
+
+            return new Station[0];
         }
     }
 }

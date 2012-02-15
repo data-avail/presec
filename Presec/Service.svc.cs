@@ -11,9 +11,11 @@ using System.Text.RegularExpressions;
 using Presec.Models.ServiceModels;
 using Presec.Models.MongoModels;
 using System.Configuration;
+using System.ServiceModel;
 
 namespace Presec
 {
+    [ServiceBehavior(IncludeExceptionDetailInFaults = true)]
     public class Service : DataService<CustomDataServiceProvider>
     {
         // Этот метод вызывается только один раз для инициализации серверных политик.
@@ -37,6 +39,15 @@ namespace Presec
                 return base.CreateQuery<Station>();
             }
         }
+
+        public IQueryable<Line> Lines
+        {
+            get
+            {
+                return base.CreateQuery<Line>();
+            }
+        }
+
 
         public override object RepositoryFor(string fullTypeName)
         {
@@ -89,7 +100,7 @@ namespace Presec
                             id = p._id
                         };
 
-                        st.limits = string.Join("|", p.boundary);
+                        st.lines = p.boundary.ToArray().Select(s=> new Line { addr = s}).ToList();
 
                         st.station = new Address
                         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Data.Services.Common;
+using Microsoft.Data.Services.Toolkit.QueryModel;
 
 namespace Presec.Models.ServiceModels
 {
@@ -11,7 +12,7 @@ namespace Presec.Models.ServiceModels
     {
         public int id { get; set; }
 
-        public string limits { get; set; }
+        public List<Line> lines { get; set; }
 
         public Address station { get; set; }
 
@@ -20,7 +21,13 @@ namespace Presec.Models.ServiceModels
         public Station[] near { get; set; }
     }
 
-    [DataServiceKey("line", "building")]
+    [DataServiceKey("addr")]
+    public class Line
+    {
+        public string addr { get; set; }
+    }
+
+    [DataServiceKey("addr")]
     public class Address
     {
         public string addr { get; set; }

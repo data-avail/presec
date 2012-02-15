@@ -1,7 +1,9 @@
 (function() {
+
   define(["addr", "mapView"], function(Addr, MapView) {
     var Find;
     return Find = (function() {
+
       function Find() {
         this.addr = new Addr.Addr();
         this.station = new Addr.Addr();
@@ -10,7 +12,10 @@
         this.boundary = ko.observableArray();
         this.mapView = new MapView.MapView();
       }
+
       return Find;
+
     })();
   });
+
 }).call(this);

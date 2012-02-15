@@ -10,6 +10,7 @@ using Norm;
 using System.Text.RegularExpressions;
 using Presec.Models.ServiceModels;
 using Presec.Models.MongoModels;
+using System.Configuration;
 
 namespace Presec
 {
@@ -74,7 +75,7 @@ namespace Presec
                     regex = string.Format(".*{0}^d*{1}^d.*", spts[0], spts[1]);
                 }
 
-                using (var db = Mongo.Create("mongodb://baio:election2012@ds029847.mongolab.com:29847/elect-moscow"))
+                using (var db = Mongo.Create(ConfigurationManager.AppSettings["MongoConnectionString"]))
                 {
                     var col = db.GetCollection<Doc>("moscow");
 

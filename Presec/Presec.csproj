@@ -146,6 +146,7 @@
     <Content Include="Scripts\App\main.js" />
     <Content Include="Scripts\App\Models\addr.js" />
     <Content Include="Scripts\App\Models\find.js" />
+    <Content Include="Scripts\App\Models\mapView.js" />
     <Content Include="Scripts\App\router.js" />
     <Content Include="Scripts\App\text.js" />
     <Content Include="Scripts\App\underscore.js" />
@@ -229,6 +230,10 @@
     <None Include="Scripts\App\Models\find.coffee">
       <Generator>CoffeeScriptGenerator</Generator>
       <LastGenOutput>find1.js</LastGenOutput>
+    </None>
+    <None Include="Scripts\App\Models\mapView.coffee">
+      <Generator>CoffeeScriptGenerator</Generator>
+      <LastGenOutput>mapView1.js</LastGenOutput>
     </None>
     <None Include="Scripts\App\README.md" />
     <None Include="Scripts\App\router.coffee">

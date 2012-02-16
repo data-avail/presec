@@ -12,6 +12,8 @@ using Presec.Models.ServiceModels;
 using Presec.Models.MongoModels;
 using System.Configuration;
 using System.ServiceModel;
+using Presec.Norm.Geo;
+using Norm.BSON;
 
 namespace Presec
 {
@@ -92,7 +94,6 @@ namespace Presec
 
                     var q = col.AsQueryable().Where(p => p.boundary.Any(s => Regex.IsMatch(s, regex, RegexOptions.IgnoreCase)));
 
-
                     return q.ToArray().Select((p) =>
                     {
                         var st = new Station
@@ -120,8 +121,12 @@ namespace Presec
                             geo = p.uik.geo != null ? new GeoPoint { lat = p.uik.geo[0], lon = p.uik.geo[1] } : null
                         };
 
+                        //var near = col.Find(new { station = new { geo = new NearQualifier(st.station.geo.lat, st.station.geo.lon) } }).Where(s=>s != null).ToArray();
+
                         return st;
                     });
+
+                    
                 }
             }
 

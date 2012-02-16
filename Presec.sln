@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presec", "Presec\Presec.csproj", "{A616CE4D-D783-48AD-A19E-01181A816428}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presec.Test", "Presec.Test\Presec.Test.csproj", "{0D30545D-C06E-478A-B722-49C85D53B656}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ECAB2A8C-79CE-4923-B9A7-D87C12FEA9C8}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		Presec.vsmdi = Presec.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Presec.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -13,6 +25,10 @@ Global
 		{A616CE4D-D783-48AD-A19E-01181A816428}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A616CE4D-D783-48AD-A19E-01181A816428}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A616CE4D-D783-48AD-A19E-01181A816428}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D30545D-C06E-478A-B722-49C85D53B656}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D30545D-C06E-478A-B722-49C85D53B656}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D30545D-C06E-478A-B722-49C85D53B656}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D30545D-C06E-478A-B722-49C85D53B656}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -79,6 +79,9 @@
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\MongoModels.cs" />
+    <Compile Include="Norm\Geo\LatLng.cs" />
+    <Compile Include="Norm\Geo\GeoQ.cs" />
+    <Compile Include="Norm\Geo\Qualifyers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service.svc.cs">
       <DependentUpon>Service.svc</DependentUpon>
@@ -226,6 +229,7 @@
     <Content Include="Views\Shared\_Body.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Norm\Geo\README.md" />
     <None Include="Scripts\App\Bindings\ymap.bindings.coffee">
       <Generator>CoffeeScriptGenerator</Generator>
       <LastGenOutput>ymap.bindings1.js</LastGenOutput>

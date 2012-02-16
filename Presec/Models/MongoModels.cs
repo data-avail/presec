@@ -20,6 +20,8 @@ namespace Presec.Models.MongoModels
         public int? parent {get; set;}
 
         public int[] crn { get; set; }
+
+        public float[] geo { get; set; }
     }
 
     public class DocAddr

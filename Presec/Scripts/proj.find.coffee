@@ -20,15 +20,9 @@ $ ->
                 deferEvaluation: true
                 owner: @
             @similars = ko.computed
-                read: -> 
-                  if @results().length > 1
-                    res = []
-                    for x in @results().splice 0, 1
-                      line = new LineModel x.id(), x.lines().filter (y) => new RegExp(".*#{@search()}.*", "i").test y.addr()
-                      res.concat line
-                    res
-                deferEvaluation: true
-                owner: @          
+                read: -> @results().filter (x) => x != @results()[0]
+                owner: @
+
     viewModel = new  ViewModel()
 
     ko.applyBindings viewModel

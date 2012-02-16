@@ -15,13 +15,10 @@ $ ->
         constructor: ->
             @search = ko.observable()
             @results = ko.observableArray()
-            @first = ko.computed
-                read: -> @results()[0]
-                deferEvaluation: true
-                owner: @
-            @similars = ko.computed
-                read: -> @results().filter (x) => x != @results()[0]
-                owner: @
+            @first = ko.computed => @results()[0]
+            @similars = ko.computed =>
+              for r in @results().filter((x) => x != @results()[0])
+                new LineModel r.id(), r.lines().filter((x) => new RegExp(".*" + (@search()) + ".*", "i").test(x.addr())).map((x)=>x.addr())
 
     viewModel = new  ViewModel()
 

@@ -1,5 +1,5 @@
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   $(function() {
     var LineModel, ViewModel, viewModel;
     $("#search_button").click(function() {
@@ -11,35 +11,47 @@
       });
     });
     LineModel = (function() {
+
       function LineModel(id, lines) {
         this.id = id;
         this.lines = lines;
       }
+
       return LineModel;
+
     })();
     ViewModel = (function() {
+
       function ViewModel() {
+        var _this = this;
         this.search = ko.observable();
         this.results = ko.observableArray();
-        this.first = ko.computed({
-          read: function() {
-            return this.results()[0];
-          },
-          deferEvaluation: true,
-          owner: this
+        this.first = ko.computed(function() {
+          return _this.results()[0];
         });
-        this.similars = ko.computed({
-          read: function() {
-            return this.results().filter(__bind(function(x) {
-              return x !== this.results()[0];
-            }, this));
-          },
-          owner: this
+        this.similars = ko.computed(function() {
+          var r, _i, _len, _ref, _results;
+          _ref = _this.results().filter(function(x) {
+            return x !== _this.results()[0];
+          });
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            r = _ref[_i];
+            _results.push(new LineModel(r.id(), r.lines().filter(function(x) {
+              return new RegExp(".*" + (_this.search()) + ".*", "i").test(x.addr());
+            }).map(function(x) {
+              return x.addr();
+            })));
+          }
+          return _results;
         });
       }
+
       return ViewModel;
+
     })();
     viewModel = new ViewModel();
     return ko.applyBindings(viewModel);
   });
+
 }).call(this);

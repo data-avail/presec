@@ -41,6 +41,12 @@
     <Reference Include="Microsoft.Data.Services.Toolkit">
       <HintPath>..\libs\Microsoft.Data.Services.Toolkit.dll</HintPath>
     </Reference>
+    <Reference Include="MongoDB.Bson">
+      <HintPath>..\libs\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver">
+      <HintPath>..\libs\MongoDB.Driver.dll</HintPath>
+    </Reference>
     <Reference Include="Norm">
       <HintPath>..\packages\NoRM.0.9.8\lib\Norm.dll</HintPath>
     </Reference>

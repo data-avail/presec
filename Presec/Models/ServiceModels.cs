@@ -12,7 +12,7 @@ namespace Presec.Models.ServiceModels
     {
         public int id { get; set; }
 
-        public List<Line> lines { get; set; }
+        public Line[] lines { get; set; }
 
         public Address station { get; set; }
 
@@ -44,9 +44,9 @@ namespace Presec.Models.ServiceModels
     [DataServiceKey("lon", "lat")]
     public class GeoPoint
     {
-        public float lon { get; set; }
+        public double lon { get; set; }
 
-        public float lat { get; set; }
+        public double lat { get; set; }
     }
 
 }

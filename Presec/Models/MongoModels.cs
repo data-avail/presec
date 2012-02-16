@@ -21,7 +21,7 @@ namespace Presec.Models.MongoModels
 
         public int[] crn { get; set; }
 
-        public float[] geo { get; set; }
+        public double[] geo { get; set; }
     }
 
     public class DocAddr
@@ -34,6 +34,6 @@ namespace Presec.Models.MongoModels
 
         public string aux { get; set; }
 
-        public float[] geo { get; set; }
+        public double[] geo { get; set; }
     }
 }

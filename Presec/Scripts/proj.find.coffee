@@ -1,4 +1,9 @@
 $ ->
+    map = null
+    createMap = ->
+      map = new YMaps.Map $("#map")[0]
+      map.setCenter new YMaps.GeoPoint(37.64, 55.76), 10
+
     $(".toggle_layout").hide()
     #events
     $("#search_button").click ->
@@ -6,8 +11,11 @@ $ ->
         OData.read "/Service.svc/Stations?addr=#{search}&$expand=lines,near/lines", (data) ->
           ko.mapping.fromJS data, {}, viewModel
           viewModel.search search
-          #ko.applyBindings viewModel
-    #ko
+          if viewModel.first()
+            geo = viewModel.first().station.geo
+            if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
+            placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#storehouseIcon"}
+            map.addOverlay placemark
 
     class LineModel
       constructor:(@id, @lines) ->
@@ -40,3 +48,5 @@ $ ->
     viewModel = new  ViewModel()
 
     ko.applyBindings viewModel
+
+    createMap()

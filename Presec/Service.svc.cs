@@ -107,7 +107,7 @@ namespace Presec
                 server.Connect();
                 var db = server.GetDatabase(dbName);
                 var collection = db.GetCollection<Doc>("moscow");
-                var q = collection.Find(Query.Matches("boundary", BsonRegularExpression.Create(regex, "i")));
+                var q = collection.Find(Query.Matches("boundary", BsonRegularExpression.Create(regex, "i"))).Take(5);
 
                 return q.ToArray().Select((p) =>
                 {
@@ -136,9 +136,12 @@ namespace Presec
                         geo = p.uik.geo != null ? new GeoPoint { lat = p.uik.geo[0], lon = p.uik.geo[1] } : null
                     };
 
-                    var q1 = collection.Find(Query.Near("station.geo", st.station.geo.lat, st.station.geo.lon, 5));
+                    if (st.station.geo != null)
+                    {
+                        var q1 = collection.Find(Query.Near("station.geo", st.station.geo.lat, st.station.geo.lon, 5));
 
-                    st.near = q1.Take(5).Select(s => new Station { id = s._id, lines = s.boundary.Select(x => new Line { addr = x }).ToArray() }).ToArray();
+                        st.near = q1.Take(5).Select(s => new Station { id = s._id, lines = s.boundary.Select(x => new Line { addr = x }).ToArray() }).ToArray();
+                    }
 
                     return st;
                 });

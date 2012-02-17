@@ -71,10 +71,10 @@ namespace Presec.Test
         ///Check all stations for addresses like винокур
         ///</summary>
         [TestMethod()]
-        public void GetAllByAddr()
+        public void GetAllByAddr_винокур()
         {
-            StationRepository target = new StationRepository(); // TODO: инициализация подходящего значения
-            ODataQueryOperation operation = new ODataQueryOperation(); // TODO: инициализация подходящего значения
+            StationRepository target = new StationRepository(); 
+            ODataQueryOperation operation = new ODataQueryOperation(); 
             operation.ContextParameters = new Dictionary<string, string>();
             operation.ContextParameters.Add("addr", "винокур");
             IEnumerable<Station> actual;
@@ -84,7 +84,39 @@ namespace Presec.Test
             Assert.AreEqual(2173, first.id);
             Assert.AreEqual(5, first.near.Count());
 
-            //Assert.Inconclusive("Проверьте правильность этого метода теста.");
+            
         }
+
+        /// <summary>
+        ///Check all stations for addresses like ник
+        ///</summary>
+        [TestMethod()]
+        public void GetAllByAddr_ник()
+        {
+            StationRepository target = new StationRepository();
+            ODataQueryOperation operation = new ODataQueryOperation();
+            operation.ContextParameters = new Dictionary<string, string>();
+            operation.ContextParameters.Add("addr", "ник");
+            IEnumerable<Station> actual;
+            actual = target.GetAll(operation);
+            Assert.AreEqual(5, actual.Count());
+        }
+
+
+        /// <summary>
+        ///Check for case when none station found
+        ///</summary>
+        [TestMethod()]
+        public void GetAllByAddrNotFound()
+        {
+            StationRepository target = new StationRepository();
+            ODataQueryOperation operation = new ODataQueryOperation();
+            operation.ContextParameters = new Dictionary<string, string>();
+            operation.ContextParameters.Add("addr", "гебельс");
+            IEnumerable<Station> actual;
+            actual = target.GetAll(operation);
+            Assert.AreEqual(0, actual.Count());
+        }
+
     }
 }

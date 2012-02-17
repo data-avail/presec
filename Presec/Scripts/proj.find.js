@@ -1,11 +1,47 @@
 (function() {
 
   $(function() {
-    var LineModel, ViewModel, createMap, map, viewModel;
+    var LineModel, ViewModel, createMap, createSelector, map, viewModel;
     map = null;
     createMap = function() {
       map = new YMaps.Map($("#map")[0]);
       return map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
+    };
+    createSelector = function() {
+      var search;
+      search = $("#search_field");
+      return $("#search_field").autocomplete({
+        minLength: 2,
+        source: function(req, res) {
+          var geocoder;
+          geocoder = new YMaps.Geocoder("Россия, Московская область, город Москва, улица " + req.term);
+          return YMaps.Events.observe(geocoder, geocoder.Events.Load, function() {
+            return res(this._objects.map(function(x) {
+              return {
+                label: x.text,
+                value: x.text,
+                key: x._point
+              };
+            }));
+          });
+          /*
+                    $.ajax
+                      url : "http://geocode-maps.yandex.ru/1.x/"
+                      data :
+                        geocode : "Россия, город Москва, улица #{req.term}"
+                        search_type : "all"
+                        lang : "ru-RU"
+                        key : "AOpIPk8BAAAAVW-PBgIAY2B20rPw1PcOX0Gkn6Ah7e15L9QAAAAAAAAAAACXy_5ZdWMyS9NOY137nkvh99lqew=="
+                        format : "json"
+                        ll : "37.617671000000016,55.75576799999372"
+                        spn: "1.51062"
+                      success: (data) ->
+                        res data.response.GeoObjectCollection.featureMember
+                          #.filter((x) -> x.GeoObject.metaDataProperty.GeocoderMetaData.kind == "street" || x.GeoObject.metaDataProperty.GeocoderMetaData.kind == "district")
+                          .map( (x)-> label : x.GeoObject.name, value : x.GeoObject.name, key : x.GeoObject.Point )
+          */
+        }
+      });
     };
     $(".toggle_layout").hide();
     $("#search_button").click(function() {
@@ -97,7 +133,8 @@
     };
     viewModel = new ViewModel();
     ko.applyBindings(viewModel);
-    return createMap();
+    createMap();
+    return createSelector();
   });
 
 }).call(this);

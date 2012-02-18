@@ -22,6 +22,12 @@ namespace Presec.Service.Repositories
 
             if (!string.IsNullOrEmpty(term))
             {
+                var key = term.Replace(" ","").Replace(",","");
+                var cache = new Cahching.Cache<IEnumerable<GeoSuggestion>>();
+                var suggestions = cache.Get(key);
+                if (suggestions != null)
+                    return suggestions;
+
                 System.Net.WebClient client = new System.Net.WebClient();
 
                 // Add a user agent header in case the 
@@ -45,11 +51,17 @@ namespace Presec.Service.Repositories
                 var status = xdoc.Root.Descendants("status").Single();
                 if (status.Value == "OK")
                 {
-                    return xdoc.Root.Descendants("prediction")
+                    suggestions = xdoc.Root.Descendants("prediction")
                         //.Where(p => p.Descendants("type").Any(s => s.Value == "geocode" || s.Value == "route"))
                             .Select(p => new GeoSuggestion { 
-                                descr = p.Descendants("description").Single().Value, 
-                                term = p.Descendants("term").Descendants("value").First().Value });
+                                id = p.Descendants("id").Single().Value,
+                                descr = p.Descendants("description").Single().Value,
+                                refer = p.Descendants("reference").Single().Value, 
+                                term = p.Descendants("term").Descendants("value").First().Value }).ToArray();
+
+                    cache.Set(key, suggestions);
+
+                    return suggestions;
                 }
 
             }

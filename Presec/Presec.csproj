@@ -37,6 +37,9 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.4.1.10331.0\lib\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Enyim.Caching">
+      <HintPath>..\packages\EnyimMemcached.2.11\lib\net35\Enyim.Caching.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Services.Toolkit">
       <HintPath>..\libs\Microsoft.Data.Services.Toolkit.dll</HintPath>
@@ -84,6 +87,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Service\Cahching\Cache.cs" />
+    <Compile Include="Service\Cahching\ICache.cs" />
     <Compile Include="Service\MongoModels.cs" />
     <Compile Include="Norm\Geo\LatLng.cs" />
     <Compile Include="Norm\Geo\GeoQ.cs" />

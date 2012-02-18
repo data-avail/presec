@@ -7,6 +7,7 @@ using Microsoft.Data.Services.Toolkit.QueryModel;
 using Presec.Service.Models;
 using System.Collections.Generic;
 using Presec.Service.Repositories;
+using Presec.Service.Cahching;
 
 namespace Presec.Test
 {
@@ -129,6 +130,10 @@ namespace Presec.Test
             IEnumerable<GeoSuggestion> actual;
             actual = target.GetAll(operation);
             Assert.AreNotEqual(0, actual.Count());
+            Assert.AreNotEqual(null, actual.First().id);
+            Assert.AreNotEqual(null, actual.First().refer);
+            Assert.AreNotEqual(null, actual.First().term);
+            Assert.AreNotEqual(null, actual.First().descr);
         }
 
         [TestMethod()]
@@ -141,6 +146,11 @@ namespace Presec.Test
             IEnumerable<GeoSuggestion> actual;
             actual = target.GetAll(operation);
             Assert.AreNotEqual(0, actual.Count());
+            Assert.AreNotEqual(null, actual.First().id);
+            Assert.AreNotEqual(null, actual.First().refer);
+            Assert.AreNotEqual(null, actual.First().term);
+            Assert.AreNotEqual(null, actual.First().descr);
+
         }
 
 
@@ -153,6 +163,43 @@ namespace Presec.Test
             actual = provider.RepositoryFor("Presec.Service.Models.GeoSuggestion");
             Assert.AreNotEqual(null, actual);
         }
+
+        [TestMethod()]
+        public void CheckSuggestionCache()
+        {
+            using (var cache = new Cache<IEnumerable<GeoSuggestion>>())
+            {
+                var term = Guid.NewGuid().ToString();
+                try
+                {
+
+                    var actual = cache.Get(term);
+                    Assert.AreEqual(null, actual);
+                    var geoSuggestion1 = new GeoSuggestion { id = "id1", descr = "descr1", refer = "refer1", term = term };
+                    var geoSuggestion2 = new GeoSuggestion { id = "id2", descr = "descr2", refer = "refer2", term = term };
+                    cache.Set(term, new [] {geoSuggestion1, geoSuggestion2});
+                    actual = cache.Get(term);
+                    Assert.AreNotEqual(null, actual);
+                    var act = actual.ToArray();
+                    Assert.AreEqual(2, act.Length);
+                    Assert.AreEqual(geoSuggestion1.id, act[0].id);
+                    Assert.AreEqual(geoSuggestion1.descr, act[0].descr);
+                    Assert.AreEqual(geoSuggestion1.refer, act[0].refer);
+                    Assert.AreEqual(geoSuggestion1.term, act[0].term);
+                    Assert.AreEqual(geoSuggestion2.id, act[1].id);
+                    Assert.AreEqual(geoSuggestion2.descr, act[1].descr);
+                    Assert.AreEqual(geoSuggestion2.refer, act[1].refer);
+                    Assert.AreEqual(geoSuggestion2.term, act[1].term);
+                    cache.Remove(term);
+                    actual = cache.Get(term);
+                    Assert.AreEqual(null, actual);
+                }
+                finally {
+                    cache.Remove(term);
+                }
+            }
+        }
+
 
     }
 }

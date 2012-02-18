@@ -5,14 +5,27 @@ $ ->
       map.setCenter new YMaps.GeoPoint(37.64, 55.76), 10
 
     createSelector = ->
+
       search = $("#search_field")
+
+      options =
+        types: ['geocode']
+
+      autocomplete = new google.maps.places.Autocomplete input, options
+
+      ###
       $("#search_field").autocomplete
         minLength : 2,
         source: (req, res) ->
-          geocoder = new YMaps.Geocoder "Россия, Московская область, город Москва, улица " + req.term
+          geocoder = new google.maps.Geocoder();
+          #geocoder.geocode {address : "Россия, Москва, #{req.term}", region : "RU"},(results, status) ->
+          geocoder.getLocations {address : "Россия, Москва, #{req.term}"}, (results) ->
+            console.log results
+
+          geocoder = new YMaps.Geocoder "Россия, Московская область, город Москва, улица #{req.term}, дом"
           YMaps.Events.observe geocoder, geocoder.Events.Load, ->
             res @_objects.map( (x) -> label : x.text, value : x.text, key : x._point )
-          ###
+
           $.ajax
             url : "http://geocode-maps.yandex.ru/1.x/"
             data :
@@ -27,7 +40,7 @@ $ ->
               res data.response.GeoObjectCollection.featureMember
                 #.filter((x) -> x.GeoObject.metaDataProperty.GeocoderMetaData.kind == "street" || x.GeoObject.metaDataProperty.GeocoderMetaData.kind == "district")
                 .map( (x)-> label : x.GeoObject.name, value : x.GeoObject.name, key : x.GeoObject.Point )
-          ###
+      ###
 
 
     $(".toggle_layout").hide()

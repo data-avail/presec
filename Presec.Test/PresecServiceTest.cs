@@ -169,7 +169,7 @@ namespace Presec.Test
         public void CheckSuggestionCache()
         {
             //Configuration variables from add-ons (including database connectionstrings) are NOT available in the application configuration file while tests are executed
-            if (ConfigurationManager.AppSettings["Environment"] == "Release")
+            if (ConfigurationManager.AppSettings["Environment"] != "Debug")
                 return;
 
             using (var cache = new Cache<IEnumerable<GeoSuggestion>>())

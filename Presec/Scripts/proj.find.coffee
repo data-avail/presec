@@ -5,49 +5,17 @@ $ ->
       map.setCenter new YMaps.GeoPoint(37.64, 55.76), 10
 
     createSelector = ->
-
-      search = $("#search_field")
-
-      options =
-        types: ['geocode']
-
-      autocomplete = new google.maps.places.Autocomplete input, options
-
-      ###
       $("#search_field").autocomplete
         minLength : 2,
         source: (req, res) ->
-          geocoder = new google.maps.Geocoder();
-          #geocoder.geocode {address : "Россия, Москва, #{req.term}", region : "RU"},(results, status) ->
-          geocoder.getLocations {address : "Россия, Москва, #{req.term}"}, (results) ->
-            console.log results
-
-          geocoder = new YMaps.Geocoder "Россия, Московская область, город Москва, улица #{req.term}, дом"
-          YMaps.Events.observe geocoder, geocoder.Events.Load, ->
-            res @_objects.map( (x) -> label : x.text, value : x.text, key : x._point )
-
-          $.ajax
-            url : "http://geocode-maps.yandex.ru/1.x/"
-            data :
-              geocode : "Россия, город Москва, улица #{req.term}"
-              search_type : "all"
-              lang : "ru-RU"
-              key : "AOpIPk8BAAAAVW-PBgIAY2B20rPw1PcOX0Gkn6Ah7e15L9QAAAAAAAAAAACXy_5ZdWMyS9NOY137nkvh99lqew=="
-              format : "json"
-              ll : "37.617671000000016,55.75576799999372"
-              spn: "1.51062"
-            success: (data) ->
-              res data.response.GeoObjectCollection.featureMember
-                #.filter((x) -> x.GeoObject.metaDataProperty.GeocoderMetaData.kind == "street" || x.GeoObject.metaDataProperty.GeocoderMetaData.kind == "district")
-                .map( (x)-> label : x.GeoObject.name, value : x.GeoObject.name, key : x.GeoObject.Point )
-      ###
-
+          OData.read "/Service/PresecService.svc/GeoSuggestions?term=россия, москва, #{req.term}", (data) ->
+              res data.results.map( (x)-> label : x.descr, value : x.term )
 
     $(".toggle_layout").hide()
     #events
     $("#search_button").click ->
         search = $("#search_field").val()
-        OData.read "/Service.svc/Stations?addr=#{search}&$expand=lines,near/lines", (data) ->
+        OData.read "/Service/PresecService.svc/Stations?addr=#{search}&$expand=lines,near/lines", (data) ->
           ko.mapping.fromJS data, {}, viewModel
           viewModel.search search
           if viewModel.first()

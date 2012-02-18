@@ -125,11 +125,24 @@ namespace Presec.Test
             GeoSuggestionRepository target = new GeoSuggestionRepository();
             ODataQueryOperation operation = new ODataQueryOperation();
             operation.ContextParameters = new Dictionary<string, string>();
-            operation.ContextParameters.Add("term", "россия, москва, вин");
+            operation.ContextParameters.Add("term", "россия, москва, виноку");
             IEnumerable<GeoSuggestion> actual;
             actual = target.GetAll(operation);
             Assert.AreNotEqual(0, actual.Count());
         }
+
+        [TestMethod()]
+        public void GetSuggestions_орехов()
+        {
+            GeoSuggestionRepository target = new GeoSuggestionRepository();
+            ODataQueryOperation operation = new ODataQueryOperation();
+            operation.ContextParameters = new Dictionary<string, string>();
+            operation.ContextParameters.Add("term", "россия, москва, орехов");
+            IEnumerable<GeoSuggestion> actual;
+            actual = target.GetAll(operation);
+            Assert.AreNotEqual(0, actual.Count());
+        }
+
 
         [TestMethod()]
         public void CheckDataServiceProviders()

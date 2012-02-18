@@ -50,12 +50,12 @@ namespace Presec.Service.Models
     }
 
     //http://code.google.com/apis/maps/documentation/places/autocomplete.html
-    [DataServiceKey("addr")]
+    [DataServiceKey("descr")]
     public class GeoSuggestion
     {
-        public string addr { get; set; }
+        public string term { get; set; }
 
-        public GeoPoint geo { get; set; }
+        public string descr { get; set; }
     }
 
 }

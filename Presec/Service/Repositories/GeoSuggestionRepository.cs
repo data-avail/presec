@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using Presec.Service.Models;
 using Microsoft.Data.Services.Toolkit.QueryModel;
+using System.Xml.Linq;
+using System.Configuration;
 
 namespace Presec.Service.Repositories
 {
@@ -29,15 +31,27 @@ namespace Presec.Service.Repositories
                 client.QueryString.Add("input", term);
                 client.QueryString.Add("sensor", "false");
                 client.QueryString.Add("types", "geocode");
-                client.QueryString.Add("key", "AIzaSyDPSsQMa98n7ZU1WMqpGY3tGJrNcvRmFR0");
+                client.QueryString.Add("key", ConfigurationManager.AppSettings["GoogleAPIKey"]);
 
 
-                System.IO.Stream data = client.OpenRead("https://maps.googleapis.com/maps/api/place/autocomplete/json");//?input=россия,+москва,+вин&sensor=flase&key=AIzaSyDPSsQMa98n7ZU1WMqpGY3tGJrNcvRmFR0");
+                System.IO.Stream data = client.OpenRead("https://maps.googleapis.com/maps/api/place/autocomplete/xml");
                 System.IO.StreamReader reader = new System.IO.StreamReader(data);
-                string s = reader.ReadToEnd();
-                Console.WriteLine(s);
+                string str = reader.ReadToEnd();
+
                 data.Close();
                 reader.Close();
+
+                XDocument xdoc = XDocument.Parse(str);
+                var status = xdoc.Root.Descendants("status").Single();
+                if (status.Value == "OK")
+                {
+                    return xdoc.Root.Descendants("prediction")
+                        //.Where(p => p.Descendants("type").Any(s => s.Value == "geocode" || s.Value == "route"))
+                            .Select(p => new GeoSuggestion { 
+                                descr = p.Descendants("description").Single().Value, 
+                                term = p.Descendants("term").Descendants("value").First().Value });
+                }
+
             }
 
             return new GeoSuggestion[0];

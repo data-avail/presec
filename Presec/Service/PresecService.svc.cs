@@ -44,6 +44,13 @@ namespace Presec
             }
         }
 
+        public IQueryable<GeoSuggestion> GeoSuggestions
+        {
+            get
+            {
+                return base.CreateQuery<GeoSuggestion>();
+            }
+        }
 
         public override object RepositoryFor(string fullTypeName)
         {

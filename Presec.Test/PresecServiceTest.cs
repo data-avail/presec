@@ -8,6 +8,7 @@ using Presec.Service.Models;
 using System.Collections.Generic;
 using Presec.Service.Repositories;
 using Presec.Service.Cahching;
+using System.Configuration;
 
 namespace Presec.Test
 {
@@ -167,6 +168,10 @@ namespace Presec.Test
         [TestMethod()]
         public void CheckSuggestionCache()
         {
+            //Configuration variables from add-ons (including database connectionstrings) are NOT available in the application configuration file while tests are executed
+            if (ConfigurationManager.AppSettings["Environment"] == "Release")
+                return;
+
             using (var cache = new Cache<IEnumerable<GeoSuggestion>>())
             {
                 var term = Guid.NewGuid().ToString();

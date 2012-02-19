@@ -6,10 +6,16 @@ $ ->
 
     createSelector = ->
       $("#search_field").autocomplete
-        minLength : 2,
+        minLength : 3,
+        autoFocus : true,
         source: (req, res) ->
           OData.read "/Service/PresecService.svc/GeoSuggestions?term=россия, москва, #{req.term}", (data) ->
               res data.results.map( (x)-> label : x.descr, value : x.term )
+
+      $("#search_field").keypress (e) ->
+        if(e.keyCode == 13)
+          e.preventDefault()
+          $("#search_button").click()
 
     $(".toggle_layout").hide()
     #events

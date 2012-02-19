@@ -104,6 +104,7 @@ namespace Presec.Service.Repositories
         {
             // var regexStr = @"^([\d]*?[\w\s]+?[^\d])([\w\.\,]*[^\d])([\d]+.*)$";
             var regexStr = @"^([\d]*?\b[^\d]+)\b(\d+.*)";
+            RawAddr = Regex.Replace(RawAddr, @"[\.,;:-]", " ");
 
             //find in clenead address - route, then premise, (premise contains any number + к or c)
             var matches = Regex.Matches(RawAddr, regexStr, RegexOptions.IgnoreCase);

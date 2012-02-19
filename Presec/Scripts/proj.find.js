@@ -8,8 +8,9 @@
       return map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
     };
     createSelector = function() {
-      return $("#search_field").autocomplete({
-        minLength: 2,
+      $("#search_field").autocomplete({
+        minLength: 3,
+        autoFocus: true,
         source: function(req, res) {
           return OData.read("/Service/PresecService.svc/GeoSuggestions?term=россия, москва, " + req.term, function(data) {
             return res(data.results.map(function(x) {
@@ -19,6 +20,12 @@
               };
             }));
           });
+        }
+      });
+      return $("#search_field").keypress(function(e) {
+        if (e.keyCode === 13) {
+          e.preventDefault();
+          return $("#search_button").click();
         }
       });
     };

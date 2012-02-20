@@ -1,40 +1,43 @@
 (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   $(function() {
-    var LineModel, ViewModel, createMap, createSelector, gCollection, map, viewModel;
+    var LineModel, ViewModel, createMap, createSelector, gCollection, loadMap, map, viewModel;
     map = null;
     gCollection = new YMaps.GeoObjectCollection();
+    loadMap = function() {
+      var bounds, id, zoom;
+      bounds = map.getBounds();
+      zoom = "street";
+      if (map.getZoom() <= 10) {
+        zoom = "city";
+      } else if (map.getZoom() <= 13) {
+        zoom = "district";
+      }
+      id = "" + bounds._left + ";" + bounds._bottom + ";" + bounds._right + ";" + bounds._top + ";" + zoom;
+      return OData.read("/Service/PresecService.svc/MapRegions('" + id + "')?$expand=coords", function(result) {
+        gCollection.removeAll();
+        return $(result.coords).each(function() {
+          var placemark, txt;
+          placemark = new YMaps.Placemark(new YMaps.GeoPoint(this.lat, this.lon), {
+            draggable: false,
+            style: "default#storehouseIcon"
+          });
+          txt = this.descr;
+          if (this.count > 1) {
+            txt = "" + txt + " (" + this.count + ")";
+          }
+          placemark.id = placemark.name = placemark.description = txt;
+          return gCollection.add(placemark);
+        });
+      });
+    };
     createMap = function() {
       map = new YMaps.Map($("#map")[0]);
       map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
       map.enableScrollZoom();
       map.addOverlay(gCollection);
       return YMaps.Events.observe(map, map.Events.BoundsChange, function(object) {
-        var bounds, id, zoom;
-        bounds = map.getBounds();
-        zoom = "street";
-        if (map.getZoom() <= 10) {
-          zoom = "city";
-        } else if (map.getZoom() <= 13) {
-          zoom = "district";
-        }
-        id = "" + bounds._left + ";" + bounds._bottom + ";" + bounds._right + ";" + bounds._top + ";" + zoom;
-        return OData.read("/Service/PresecService.svc/MapRegions('" + id + "')?$expand=coords", function(result) {
-          gCollection.removeAll();
-          return $(result.coords).each(function() {
-            var placemark, txt;
-            placemark = new YMaps.Placemark(new YMaps.GeoPoint(this.lat, this.lon), {
-              draggable: false,
-              style: "default#storehouseIcon"
-            });
-            txt = this.descr;
-            if (this.count > 1) {
-              txt = "" + txt + " (" + this.count + ")";
-            }
-            placemark.id = placemark.name = placemark.description = txt;
-            return gCollection.add(placemark);
-          });
-        });
+        return loadMap();
       });
     };
     createSelector = function() {
@@ -150,6 +153,7 @@
     viewModel = new ViewModel();
     ko.applyBindings(viewModel);
     createMap();
-    return createSelector();
+    createSelector();
+    return loadMap();
   });
 }).call(this);

@@ -16,10 +16,14 @@
             return res(data.results.map(function(x) {
               return {
                 label: x.descr,
-                value: x.term
+                value: x.term,
+                gref: x.refer
               };
             }));
           });
+        },
+        select: function(e, ui) {
+          return $(this).data("gref", ui.item.gref);
         }
       });
       return $("#search_field").keypress(function(e) {
@@ -31,9 +35,10 @@
     };
     $(".toggle_layout").hide();
     $("#search_button").click(function() {
-      var search;
+      var gref, search;
       search = $("#search_field").val();
-      return OData.read("/Service/PresecService.svc/Stations?addr=" + search + "&$expand=lines,near/lines", function(data) {
+      gref = $("#search_field").data("gref");
+      return OData.read("/Service/PresecService.svc/Stations?addr=" + search + "&gref=" + gref + "&$expand=lines,near/lines", function(data) {
         var geo, placemark;
         ko.mapping.fromJS(data, {}, viewModel);
         viewModel.search(search);

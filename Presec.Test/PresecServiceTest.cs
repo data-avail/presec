@@ -165,6 +165,7 @@ namespace Presec.Test
             Assert.AreNotEqual(null, actual);
         }
 
+        /*
         [TestMethod()]
         public void CheckSuggestionCache()
         {
@@ -175,7 +176,8 @@ namespace Presec.Test
             using (var cache = new Cache<IEnumerable<GeoSuggestion>>())
             {
                 var term = Guid.NewGuid().ToString();
-                try
+
+                //try
                 {
 
                     var actual = cache.Get(term);
@@ -198,12 +200,11 @@ namespace Presec.Test
                     cache.Remove(term);
                     actual = cache.Get(term);
                     Assert.AreEqual(null, actual);
-                }
-                finally {
                     cache.Remove(term);
                 }
             }
         }
+         */
 
         [TestMethod()]
         public void CheckGetAddrRegex()
@@ -244,7 +245,23 @@ namespace Presec.Test
                 Assert.AreEqual(expected[0], actual[0]);
                 Assert.AreEqual(expected[1], actual[1]);
             }
+
             
+        }
+
+        [TestMethod()]
+        public void GetByGoogleRef_лисичанская()
+        {
+            //ClRBAAAA8fiTTf0qlAtK1NnUblpdGtY5T_se4KtvLvxTJNjs2FnIIWK2TDgNdRcgEps1NCdPNTrHv3k1GOXlrnCvjVdGLBs_H_ToMeNfZ3MxZsqmIpgSEHm3jvB1DyRNfk0iVWaRgVkaFCmpKkegcbJuY17m_yrg9a5xzLuA
+            StationRepository target = new StationRepository();
+            ODataQueryOperation operation = new ODataQueryOperation();
+            operation.ContextParameters = new Dictionary<string, string>();
+            operation.ContextParameters.Add("addr", "россия, москва, лисичанская улица");
+            operation.ContextParameters.Add("gref", "ClRBAAAA8fiTTf0qlAtK1NnUblpdGtY5T_se4KtvLvxTJNjs2FnIIWK2TDgNdRcgEps1NCdPNTrHv3k1GOXlrnCvjVdGLBs_H_ToMeNfZ3MxZsqmIpgSEHm3jvB1DyRNfk0iVWaRgVkaFCmpKkegcbJuY17m_yrg9a5xzLuA");
+            IEnumerable<Station> actual;
+            actual = target.GetAll(operation);
+            Assert.AreEqual(5, actual.Count());
+
         }
     }
 }

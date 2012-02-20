@@ -10,7 +10,9 @@ $ ->
         autoFocus : true,
         source: (req, res) ->
           OData.read "/Service/PresecService.svc/GeoSuggestions?term=россия, москва, #{req.term}", (data) ->
-              res data.results.map( (x)-> label : x.descr, value : x.term )
+              res data.results.map( (x)-> label : x.descr, value : x.term, gref : x.refer )
+        select: (e, ui) ->
+             $(@).data "gref", ui.item.gref
 
       $("#search_field").keypress (e) ->
         if(e.keyCode == 13)
@@ -21,7 +23,8 @@ $ ->
     #events
     $("#search_button").click ->
         search = $("#search_field").val()
-        OData.read "/Service/PresecService.svc/Stations?addr=#{search}&$expand=lines,near/lines", (data) ->
+        gref = $("#search_field").data "gref"
+        OData.read "/Service/PresecService.svc/Stations?addr=#{search}&gref=#{gref}&$expand=lines,near/lines", (data) ->
           ko.mapping.fromJS data, {}, viewModel
           viewModel.search search
           if viewModel.first()

@@ -52,6 +52,23 @@ namespace Presec
             }
         }
 
+        public IQueryable<MapCoord> MapCoords
+        {
+            get
+            {
+                return base.CreateQuery<MapCoord>();
+            }
+        }
+
+        public IQueryable<MapRegion> MapRegions
+        {
+            get
+            {
+                return base.CreateQuery<MapRegion>();
+            }
+        }
+
+
         public override object RepositoryFor(string fullTypeName)
         {
             string typeName = fullTypeName.Replace("[]", string.Empty).Substring(fullTypeName.LastIndexOf('.') + 1);

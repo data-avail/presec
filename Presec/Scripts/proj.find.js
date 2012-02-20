@@ -1,11 +1,33 @@
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   $(function() {
     var LineModel, ViewModel, createMap, createSelector, map, viewModel;
     map = null;
     createMap = function() {
       map = new YMaps.Map($("#map")[0]);
-      return map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
+      map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
+      map.enableScrollZoom();
+      return YMaps.Events.observe(map, map.Events.BoundsChange, function(object) {
+        var bounds, id, zoom;
+        bounds = map.getBounds();
+        zoom = "street";
+        if (map.getZoom() <= 10) {
+          zoom = "city";
+        } else if (map.getZoom() <= 14) {
+          zoom = "district";
+        }
+        id = "" + bounds._left + ";" + bounds._bottom + ";" + bounds._right + ";" + bounds._top + ";" + zoom;
+        return OData.read("/Service/PresecService.svc/MapRegions('" + id + "')?$expand=coords", function(result) {
+          return $(result.coords).each(function() {
+            var placemark;
+            placemark = new YMaps.Placemark(new YMaps.GeoPoint(this.lat, this.lon));
+            placemark.name = "test";
+            placemark.setIconContent("test");
+            placemark.description = "test";
+            return map.addOverlay(placemark);
+          });
+        });
+      });
     };
     createSelector = function() {
       $("#search_field").autocomplete({
@@ -39,9 +61,7 @@
         viewModel.search(search);
         if (viewModel.first()) {
           geo = viewModel.first().station.geo;
-          if (geo) {
-            map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
-          }
+          if (geo) map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
           placemark = new YMaps.Placemark(map.getCenter(), {
             draggable: false,
             style: "default#storehouseIcon"
@@ -51,55 +71,62 @@
       });
     });
     LineModel = (function() {
+
       function LineModel(id, lines) {
         this.id = id;
         this.lines = lines;
       }
+
       return LineModel;
+
     })();
     ViewModel = (function() {
+
       function ViewModel() {
+        var _this = this;
         this.search = ko.observable();
         this.results = ko.observableArray();
-        this.first = ko.computed(__bind(function() {
-          return this.results()[0];
-        }, this));
-        this.similars = ko.computed(__bind(function() {
+        this.first = ko.computed(function() {
+          return _this.results()[0];
+        });
+        this.similars = ko.computed(function() {
           var r, _i, _len, _ref, _results;
-          _ref = this.results().filter(__bind(function(x) {
-            return x !== this.results()[0];
-          }, this));
+          _ref = _this.results().filter(function(x) {
+            return x !== _this.results()[0];
+          });
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             r = _ref[_i];
-            _results.push(new LineModel(r.id(), r.lines().filter(__bind(function(x) {
-              return new RegExp(".*" + (this.search()) + ".*", "i").test(x.addr());
-            }, this)).map(__bind(function(x) {
+            _results.push(new LineModel(r.id(), r.lines().filter(function(x) {
+              return new RegExp(".*" + (_this.search()) + ".*", "i").test(x.addr());
+            }).map(function(x) {
               return x.addr();
-            }, this))));
+            })));
           }
           return _results;
-        }, this));
-        this.near = ko.computed(__bind(function() {
+        });
+        this.near = ko.computed(function() {
           var n, _i, _len, _ref, _results;
-          if (this.first()) {
-            _ref = this.first().near();
+          if (_this.first()) {
+            _ref = _this.first().near();
             _results = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               n = _ref[_i];
-              _results.push(new LineModel(n.id(), n.lines().map(__bind(function(x) {
+              _results.push(new LineModel(n.id(), n.lines().map(function(x) {
                 return x.addr();
-              }, this))));
+              })));
             }
             return _results;
           } else {
             return [];
           }
-        }, this));
+        });
         this.similarToggle = ko.observable(false);
         this.nearToggle = ko.observable(false);
       }
+
       return ViewModel;
+
     })();
     ko.bindingHandlers.toggle = {
       init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -117,4 +144,5 @@
     createMap();
     return createSelector();
   });
+
 }).call(this);

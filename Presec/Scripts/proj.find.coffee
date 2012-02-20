@@ -1,10 +1,27 @@
 $ ->
-    map = null
-    createMap = ->
-      map = new YMaps.Map $("#map")[0]
-      map.setCenter new YMaps.GeoPoint(37.64, 55.76), 10
+  map = null
 
-    createSelector = ->
+  createMap = ->
+    map = new YMaps.Map $("#map")[0]
+    map.setCenter new YMaps.GeoPoint(37.64, 55.76), 10
+    map.enableScrollZoom()
+    YMaps.Events.observe map, map.Events.BoundsChange, (object) ->
+      bounds = map.getBounds()
+      zoom = "street"
+      if map.getZoom() <= 10
+        zoom = "city"
+      else if map.getZoom() <= 14
+        zoom = "district"
+      id = "#{bounds._left};#{bounds._bottom};#{bounds._right};#{bounds._top};#{zoom}"
+      OData.read "/Service/PresecService.svc/MapRegions('#{id}')?$expand=coords", (result) ->
+        $(result.coords).each ->
+          placemark = new YMaps.Placemark new YMaps.GeoPoint(@lat, @lon)
+          placemark.name ="test"
+          placemark.setIconContent "test"
+          placemark.description = "test"
+          map.addOverlay placemark
+
+  createSelector = ->
       $("#search_field").autocomplete
         minLength : 3,
         autoFocus : true,

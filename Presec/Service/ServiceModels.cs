@@ -41,7 +41,7 @@ namespace Presec.Service.Models
         public GeoPoint geo { get; set; }
     }
 
-    [DataServiceKey("lon", "lat")]
+    [DataServiceKey("lat", "lon")]
     public class GeoPoint
     {
         public double lon { get; set; }
@@ -62,5 +62,26 @@ namespace Presec.Service.Models
 
         public string refer { get; set; }
     }
+
+    [DataServiceKey("lat", "lon")]
+    [Serializable]
+    public class MapCoord
+    {
+        public double lat { get; set; }
+
+        public double lon { get; set; }
+
+        public string descr { get; set; }
+    }
+
+    [DataServiceKey("id")]
+    [Serializable]
+    public class MapRegion
+    {
+        public string id { get; set; }
+
+        public MapCoord[] coords { get; set; }
+    }
+
 
 }

@@ -246,5 +246,13 @@ namespace Presec.Test
             }
             
         }
+
+        [TestMethod()]
+        public void GetAllMoscowMapRegions()
+        {
+            MapRegionRepository target = new MapRegionRepository();
+            MapRegion actual = target.GetOne("37.398300804197795;55.51375574905723;38.08494631201029;55.90144684501253;city");
+            Assert.AreEqual(1999, actual.coords.Count());
+        }
     }
 }

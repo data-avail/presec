@@ -36,37 +36,43 @@ namespace Presec.Service.Repositories
             var db = server.GetDatabase(dbName);
             var collection = db.GetCollection<Doc>("moscow");
 
-            Doc[] q = null;
+            IEnumerable<MapCoord> coords = new MapCoord[0];
 
             if (zoom == "street")
             {
-                q = collection.Find(Query.WithinRectangle("station.geo", left, bottom, right, top)).ToArray();
+                var q = collection.Find(Query.WithinRectangle("station.geo", left, bottom, right, top));
+
+                coords = q.Select(p => new MapCoord { lat = p.station.geo[0], lon = p.station.geo[1], count = 1, descr = p._id.ToString() });
             }
             else if (zoom == "district")
             {
-                var hasParent = Query.NE("parent", null);
-                var doesntHaveDescr = Query.Exists("district", false);
-                var geo = Query.WithinRectangle("station.geo", left, bottom, right, top);
+                var hasParent = Query.NE("parent", BsonType.Null);
+                var hasDistrict = Query.Exists("district", true);
+                var geo = Query.WithinRectangle("geo", left, bottom, right, top);
+                var districts = collection.Find(Query.And(hasParent, hasDistrict, geo));
 
-                var groups = collection.Find(Query.And(hasParent, doesntHaveDescr, geo)).GroupBy(p=>p.parent);
+                coords = districts.Select(p => new MapCoord { lat = p.geo[0], lon = p.geo[1], count = (int)collection.Count(Query.EQ("parent", p._id)), descr = p.district });
 
             }
             else
             {
-                var q1 = collection.Find(Query.WithinRectangle("station.geo", left, bottom, right, top)).ToArray();
+                var regNotHasParent = Query.Exists("parent", false);
+                var regGeo = Query.WithinRectangle("geo", left, bottom, right, top);
+                var hasDistrict = Query.Exists("district", true);
+                var regions = collection.Find(Query.And(regNotHasParent, hasDistrict, regGeo)).ToArray();
+                
+                var districts = collection.Find(Query.In("parent", regions.Select(p=> BsonValue.Create(p._id)))).ToArray();
+
+                var distrCounts = districts.Select(p => new { id = p._id, parent = p.parent, count = (int)collection.Count(Query.EQ("parent", p._id)) }).ToArray();
+
+                coords = regions.Select(p =>
+                    new MapCoord { lat = p.geo[0], lon = p.geo[1], count = (int)distrCounts.Where(x => x.parent == p._id).Sum( x => x.count), descr = p.district });
+
             }
 
-
-
-            var coords = Map(q).ToArray();
-
-            return new MapRegion { id = id, coords = coords };
+            return new MapRegion { id = id, coords = coords.ToArray() };
         }
 
-        private IEnumerable<MapCoord> Map(IEnumerable<Doc> Docs)
-        {
-            return Docs.Select(p => new MapCoord { lat = p.station.geo[0], lon = p.station.geo[1] });
-        }
 
         public IEnumerable<MapRegion> GetAll(ODataQueryOperation operation)
         {

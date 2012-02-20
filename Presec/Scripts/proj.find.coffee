@@ -1,10 +1,12 @@
 $ ->
   map = null
+  gCollection = new YMaps.GeoObjectCollection()
 
   createMap = ->
     map = new YMaps.Map $("#map")[0]
     map.setCenter new YMaps.GeoPoint(37.64, 55.76), 10
     map.enableScrollZoom()
+    map.addOverlay gCollection
     YMaps.Events.observe map, map.Events.BoundsChange, (object) ->
       bounds = map.getBounds()
       zoom = "street"
@@ -14,13 +16,14 @@ $ ->
         zoom = "district"
       id = "#{bounds._left};#{bounds._bottom};#{bounds._right};#{bounds._top};#{zoom}"
       OData.read "/Service/PresecService.svc/MapRegions('#{id}')?$expand=coords", (result) ->
+        gCollection.removeAll()
         $(result.coords).each ->
-          placemark = new YMaps.Placemark new YMaps.GeoPoint(@lat, @lon)
-          placemark.name ="test"
-          placemark.setIconContent "test"
-          placemark.description = "test"
-          map.addOverlay placemark
-
+          placemark = new YMaps.Placemark new YMaps.GeoPoint(@lat, @lon), {draggable: false, style : "default#storehouseIcon"}
+          txt = @descr
+          if @count > 1 then txt = "#{txt} (#{@count})"
+          placemark.id = placemark.name = placemark.description = txt
+          gCollection.add placemark
+          
   createSelector = ->
       $("#search_field").autocomplete
         minLength : 3,

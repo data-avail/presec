@@ -12,7 +12,7 @@ $ ->
       zoom = "street"
       if map.getZoom() <= 10
         zoom = "city"
-      else if map.getZoom() <= 14
+      else if map.getZoom() <= 13
         zoom = "district"
       id = "#{bounds._left};#{bounds._bottom};#{bounds._right};#{bounds._top};#{zoom}"
       OData.read "/Service/PresecService.svc/MapRegions('#{id}')?$expand=coords", (result) ->

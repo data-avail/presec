@@ -72,6 +72,8 @@ namespace Presec.Service.Models
         public double lon { get; set; }
 
         public string descr { get; set; }
+
+        public int count { get; set; }
     }
 
     [DataServiceKey("id")]

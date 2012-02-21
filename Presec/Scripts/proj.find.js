@@ -72,7 +72,7 @@
       return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches", function(data) {
         var geo, placemark;
         ko.mapping.fromJS(data, {}, viewModel);
-        geo = viewModel.geo;
+        geo = viewModel.station().geo;
         if (geo) map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
         placemark = new YMaps.Placemark(map.getCenter(), {
           draggable: false,
@@ -94,7 +94,13 @@
     ViewModel = (function() {
 
       function ViewModel() {
-        this.search = ko.observable();
+        this.id = ko.observable();
+        this.key = ko.observable();
+        this.station = ko.observable();
+        this.uik = ko.observable();
+        this.similar = ko.observableArray();
+        this.near = ko.observableArray();
+        this.boundary = ko.observableArray();
         /*
                     @results = ko.observableArray()
                     @first = ko.computed => @results()[0]

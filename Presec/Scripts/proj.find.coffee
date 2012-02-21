@@ -48,7 +48,7 @@ $ ->
         gref = $("#search_field").data "gref"
         OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches", (data) ->
           ko.mapping.fromJS data, {}, viewModel
-          geo = viewModel.geo
+          geo = viewModel.station().geo
           if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
           placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#storehouseIcon"}
           map.addOverlay placemark
@@ -58,7 +58,13 @@ $ ->
 
     class ViewModel
         constructor: ->
-            @search = ko.observable()
+            @id = ko.observable()
+            @key = ko.observable()
+            @station = ko.observable()
+            @uik = ko.observable()
+            @similar = ko.observableArray()
+            @near = ko.observableArray()
+            @boundary = ko.observableArray()
             ###
             @results = ko.observableArray()
             @first = ko.computed => @results()[0]

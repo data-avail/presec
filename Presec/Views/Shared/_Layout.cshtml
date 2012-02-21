@@ -64,6 +64,7 @@
                                 <i class="icon-search icon-white"></i>Поиск</a>
                             </form>
                         </li>
+                        <!-- ko if: id -->
                         <li>
                             <div class="row-fluent">
                                 <a class="btn btn-small btn-info" href="#" data-bind="toggle : similarToggle, toggleOpts : {layout : 'similar_layout'}"><i class="icon-folder-close icon-white"></i>
@@ -73,15 +74,14 @@
                         </li>
                         <li class="nav-header toggle_layout similar_layout">Похожие аддресса</li>
                         <li class="toggle_layout similar_layout">
-                            <table class="table table-striped table-condensed" data-bind="template: {name: 'short-list-template', foreach: similars}">
+                            <table class="table table-striped table-condensed" data-bind="template: {name: 'addr-ref-template', foreach: similar}">
                             </table>
                         </li>
                         <li class="nav-header toggle_layout near_layout">Участки рядом</li>
                         <li class="toggle_layout near_layout">
-                            <table class="table table-striped table-condensed" data-bind="template: {name: 'short-list-template', foreach: near}">
+                            <table class="table table-striped table-condensed" data-bind="template: {name: 'addr-list-template', foreach: near}">
                             </table>
                         </li>
-                        <!-- ko with : first -->
                         <li class="nav-header">Ваш избирательный участок &nbsp;&nbsp;<span data-bind="text: id"
                             class="label label-success"></span></li>
                         <li data-bind="template: {name: 'addr-template', data: station}"></li>
@@ -89,7 +89,7 @@
                         <li data-bind="template: {name: 'addr-template', data: uik}"></li>
                         <li class="nav-header">Аддресса приписки участка</li>
                         <li>
-                            <table class="table table-striped table-condensed" data-bind="template: {name: 'line-template', foreach: lines}">
+                            <table class="table table-striped table-condensed" data-bind="template: {name: 'line-template', foreach: boundary}">
                             </table>
                         </li>
                         <!-- /ko -->
@@ -109,12 +109,24 @@
                 <script type="text/html" id="line-template">
                     <tr><td data-bind="text : addr"></td></tr>
                 </script>
-                <script type="text/html" id="short-list-template">
+                <script type="text/html" id="addr-ref-template">
                     <tr>
                         <td>
                             <span data-bind="text: id" class="label label-success"></span>
                         </td>
-                        <td data-bind="text: lines">
+                        <td>
+                        {{each lines}}
+                            <p data-bind="text: addr"></p>
+                        {{/each}}
+                        </td>
+                    </tr>
+                </script>
+                <script type="text/html" id="addr-list-template">
+                    <tr>
+                        <td>
+                            <span data-bind="text: id" class="label label-success"></span>
+                        </td>
+                        <td data-bind="text: descr">
                         </td>
                     </tr>
                 </script>

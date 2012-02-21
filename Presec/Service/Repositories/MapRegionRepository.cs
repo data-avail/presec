@@ -34,11 +34,16 @@ namespace Presec.Service.Repositories
             double top = double.Parse(spts[3], CultureInfo.InvariantCulture);
             string zoom = spts[4];
 
-            var cache = new Cahching.Cache<IEnumerable<MapCoord>>();
-            IEnumerable<MapCoord> coords = cache.Get(id);
-            if (coords != null)
-                return new MapRegion { id = id, coords = coords.ToArray() };
+            IEnumerable<MapCoord> coords = null;
 
+            var cache = new Cahching.Cache<IEnumerable<MapCoord>>();
+
+            if (zoom != "street")
+            {
+                coords = cache.Get(id);
+                if (coords != null)
+                    return new MapRegion { id = id, coords = coords.ToArray() };
+            }
 
             var server = MongoServer.Create(hostName);
             server.Connect();
@@ -48,8 +53,6 @@ namespace Presec.Service.Repositories
             //find and store in cache all district and city results, later get results for them from cache
             if (zoom == "district")
             {
-                coords = cache.Get("district");
-
                 if (coords == null)
                 {
                     var districts = collection.Find(Query.And(Query.NE("parent", BsonType.Null), Query.Exists("district", true)));
@@ -61,8 +64,6 @@ namespace Presec.Service.Repositories
             }
             else if(zoom == "city")
             {
-                coords = cache.Get("city");
-
                 var regions = collection.Find(Query.Exists("parent", false)).ToArray();
                 
                 var districts = collection.Find(Query.In("parent", regions.Select(p=> BsonValue.Create(p._id)))).ToArray();
@@ -87,30 +88,6 @@ namespace Presec.Service.Repositories
             {
                 coords = coords.Where(p=>p.lat >= left && p.lat <= right && p.lon >= bottom && p.lon <= top);
             }
-            /*
-            {
-
-                var districts = collection.Find(Query.And(Query.NE("parent", BsonType.Null), geo, Query.Exists("district", true)));
-
-                coords = districts.Select(p => new MapCoord { lat = p.geo[0], lon = p.geo[1], count = p.crn != null ? p.crn.Count() : 0, descr = p.district }).ToArray();
-
-                coords = coords.Where(p=>p.lat >= left && p.lat <= right && p.lon >= bottom && p.lon <= top);
-            }
-            else
-            {
-
-                var regions = collection.Find(Query.And(Query.Exists("parent", false), geo)).ToArray();
-                
-                var districts = collection.Find(Query.In("parent", regions.Select(p=> BsonValue.Create(p._id)))).ToArray();
-
-                var distrCounts = districts.Select(p => new { id = p._id, parent = p.parent, count = p.crn != null ? p.crn.Count() : 0 });
-
-                coords = regions.Select(p =>
-                    new MapCoord { lat = p.geo[0], lon = p.geo[1], count = (int)distrCounts.Where(x => x.parent == p._id).Sum( x => x.count), descr = p.district }).ToArray();
-            }
-             */
-            if (zoom == "street")
-                cache.Set(id, coords);
 
             return new MapRegion { id = id, coords = coords.ToArray() };
         }

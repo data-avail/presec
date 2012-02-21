@@ -115,22 +115,20 @@ namespace Presec.Test
             StationRepository target = new StationRepository();
             Station actual;
             actual = target.GetOne("гебельс");
-            Assert.AreEqual(null, actual);
+            Assert.AreNotEqual(null, actual);
+            Assert.AreEqual("not_found", actual.matchType);
         }
 
         [TestMethod()]
         public void GetSuggestions_вин()
         {
             GeoSuggestionRepository target = new GeoSuggestionRepository();
-            ODataQueryOperation operation = new ODataQueryOperation();
-            operation.ContextParameters = new Dictionary<string, string>();
-            operation.ContextParameters.Add("term", "россия, москва, виноку");
-            IEnumerable<GeoSuggestion> actual;
-            actual = target.GetAll(operation);
+            var act = target.GetOne("россия, москва, виноку");
+            Assert.AreNotEqual(null, act);
+            var actual = act.suggestions;
             Assert.AreNotEqual(0, actual.Count());
             Assert.AreNotEqual(null, actual.First().id);
             Assert.AreNotEqual(null, actual.First().refer);
-            Assert.AreNotEqual(null, actual.First().term);
             Assert.AreNotEqual(null, actual.First().descr);
         }
 
@@ -138,15 +136,12 @@ namespace Presec.Test
         public void GetSuggestions_орехов()
         {
             GeoSuggestionRepository target = new GeoSuggestionRepository();
-            ODataQueryOperation operation = new ODataQueryOperation();
-            operation.ContextParameters = new Dictionary<string, string>();
-            operation.ContextParameters.Add("term", "россия, москва, орехов");
-            IEnumerable<GeoSuggestion> actual;
-            actual = target.GetAll(operation);
+            var act = target.GetOne("россия, москва, орехов");
+            var actual = act.suggestions;
+            Assert.AreNotEqual(null, act);
             Assert.AreNotEqual(0, actual.Count());
             Assert.AreNotEqual(null, actual.First().id);
             Assert.AreNotEqual(null, actual.First().refer);
-            Assert.AreNotEqual(null, actual.First().term);
             Assert.AreNotEqual(null, actual.First().descr);
 
         }
@@ -215,19 +210,19 @@ namespace Presec.Test
                 "винок 22", "улица винокурова д. 22", //
                 "винок дом 22", "винок д. 22к2",
                 "Энтузиастов ш дом 22", "энтузиастов шоссе 22",
-                "Ленинградское шоссе, 21"
+                "Ленинградское шоссе, 21", "Улица Винокурова 22 к 1"
             }; //
 
             string[] expecteds = new[] {
-                "|винок", "улица|винокурова", //
-                "|хошемин", "площадь|хошемина", //
-                "|дагестанский", "проезд|дагестанский", //
-                "улица|сепаратистская", "улица|сепарат", //
-                "улица|сепаратистская", "улица|сепарат", //
-                "|винок,|22", "улица|винокурова,дом|22", //
-                "|винок,дом|22", "|винок,дом|22к2",
-                "шоссе|энтузиастов,дом|22", "шоссе|энтузиастов,|22",
-                "шоссе|ленинградское,|21"
+                "|винок", "улица|винокурова", //2
+                "|хошемин", "площадь|хошемина", //4
+                "|дагестанский", "проезд|дагестанский", //6
+                "улица|сепаратистская", "улица|сепарат", //8
+                "улица|сепаратистская", "улица|сепарат", //10
+                "|винок,|22", "улица|винокурова,дом|22", //12
+                "|винок,дом|22", "|винок,дом|22|корпус|2",//14
+                "шоссе|энтузиастов,дом|22", "шоссе|энтузиастов,|22",//16
+                "шоссе|ленинградское,|21",  "улица|винокурова,|22|корпус|1" //18
             }; //
 
 
@@ -291,6 +286,33 @@ namespace Presec.Test
             Assert.AreEqual(2173, actual.id);
             Assert.AreEqual(2174, actual.similar[0].id);
             Assert.AreEqual(5, actual.near.Count());
+        }
+
+        [TestMethod()]
+        public void FindOne_strict_винокур()
+        {
+            StationRepository target = new StationRepository();
+            var actual = target.GetOne("винокур");
+            Assert.AreNotEqual(null, actual);
+            Assert.AreEqual(1, actual.similar.Count());
+            Assert.AreEqual(2173, actual.id);
+            Assert.AreEqual(2174, actual.similar[0].id);
+            Assert.AreEqual(5, actual.near.Count());
+
+        }
+
+        [TestMethod()]
+        public void FindOne_Улица_Шверника()
+        {
+            StationRepository target = new StationRepository();
+            var actual = target.GetOne("Улица Шверника");
+            Assert.AreNotEqual(null, actual);
+            Assert.AreEqual(0, actual.similar.Count());
+            Assert.AreEqual(2174, actual.id);
+            //Assert.AreEqual(1362, actual.similar[0].id);
+            Assert.AreEqual(5, actual.near.Count());
+
+            
         }
 
 

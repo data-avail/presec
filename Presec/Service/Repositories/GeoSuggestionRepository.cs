@@ -6,27 +6,21 @@ using Presec.Service.Models;
 using Microsoft.Data.Services.Toolkit.QueryModel;
 using System.Xml.Linq;
 using System.Configuration;
+using System.Text.RegularExpressions;
 
 namespace Presec.Service.Repositories
 {
     public class GeoSuggestionRepository
     {
-        public GeoSuggestion GetOne(string id)
+        public GeoSuggestion GetOne(string term)
         {
-            return new GeoSuggestion();
-        }
-
-        public IEnumerable<GeoSuggestion> GetAll(ODataQueryOperation operation)
-        {
-            var term = operation.ContextParameters["term"];
-
             if (!string.IsNullOrEmpty(term))
             {
-                var key = term.Replace(" ","").Replace(",","");
-                var cache = new Cahching.Cache<IEnumerable<GeoSuggestion>>();
-                var suggestions = cache.Get(key);
-                if (suggestions != null)
-                    return suggestions;
+                var key = Regex.Replace(term, @"[\s\.,;:]", "");
+                var cache = new Cahching.Cache<GeoSuggestion>();
+                var geoSug = cache.Get(key);
+                if (geoSug != null)
+                    return geoSug;
 
                 System.Net.WebClient client = new System.Net.WebClient();
 
@@ -51,21 +45,30 @@ namespace Presec.Service.Repositories
                 var status = xdoc.Root.Descendants("status").Single();
                 if (status.Value == "OK")
                 {
-                    suggestions = xdoc.Root.Descendants("prediction")
+                    var suggestions = xdoc.Root.Descendants("prediction")
                         //.Where(p => p.Descendants("type").Any(s => s.Value == "geocode" || s.Value == "route"))
-                            .Select(p => new GeoSuggestion { 
+                            .Select(p => new Suggestion
+                            {
                                 id = p.Descendants("id").Single().Value,
                                 descr = p.Descendants("description").Single().Value,
-                                refer = p.Descendants("reference").Single().Value, 
-                                term = p.Descendants("term").Descendants("value").First().Value }).ToArray();
+                                refer = p.Descendants("reference").Single().Value,
+                                term = p.Descendants("term").Descendants("value").First().Value
+                            }).ToArray();
+                    geoSug = new GeoSuggestion { term = term, suggestions = suggestions };
 
-                    cache.Set(key, suggestions);
+                    cache.Set(key, geoSug);
 
-                    return suggestions;
+                    return geoSug;
                 }
 
             }
 
+            return new GeoSuggestion { term = term, suggestions = new Suggestion[0] };
+
+        }
+
+        public IEnumerable<GeoSuggestion> GetAll(ODataQueryOperation operation)
+        {
             return new GeoSuggestion[0];
         }
     }

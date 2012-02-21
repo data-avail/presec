@@ -52,6 +52,15 @@ namespace Presec
             }
         }
 
+        public IQueryable<Suggestion> Suggestions
+        {
+            get
+            {
+                return base.CreateQuery<Suggestion>();
+            }
+        }
+
+
         public IQueryable<MapCoord> MapCoords
         {
             get

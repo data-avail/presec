@@ -31,8 +31,8 @@ $ ->
         minLength : 3,
         autoFocus : true,
         source: (req, res) ->
-          OData.read "/Service/PresecService.svc/GeoSuggestions?term=россия, москва, #{req.term}", (data) ->
-              res data.results.map( (x)-> label : x.descr, value : x.term, gref : x.refer )
+          OData.read "/Service/PresecService.svc/GeoSuggestions('россия, москва, #{req.term}')?$expand=suggestions", (data) ->
+              res data.suggestions.map( (x)-> label : x.descr, value : x.term, gref : x.refer )
         select: (e, ui) ->
              $(@).data "gref", ui.item.gref
 

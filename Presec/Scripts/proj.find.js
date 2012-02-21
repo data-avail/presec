@@ -1,5 +1,4 @@
 (function() {
-
   $(function() {
     var LineModel, ViewModel, createMap, createSelector, gCollection, loadMap, map, viewModel;
     map = null;
@@ -23,7 +22,9 @@
             style: "default#storehouseIcon"
           });
           txt = this.descr;
-          if (this.count > 1) txt = "" + txt + " (" + this.count + ")";
+          if (this.count > 1) {
+            txt = "" + txt + " (" + this.count + ")";
+          }
           placemark.id = placemark.name = placemark.description = txt;
           return gCollection.add(placemark);
         });
@@ -43,8 +44,8 @@
         minLength: 3,
         autoFocus: true,
         source: function(req, res) {
-          return OData.read("/Service/PresecService.svc/GeoSuggestions?term=россия, москва, " + req.term, function(data) {
-            return res(data.results.map(function(x) {
+          return OData.read("/Service/PresecService.svc/GeoSuggestions('россия, москва, " + req.term + "')?$expand=suggestions", function(data) {
+            return res(data.suggestions.map(function(x) {
               return {
                 label: x.descr,
                 value: x.term,
@@ -73,7 +74,9 @@
         var geo, placemark;
         ko.mapping.fromJS(data, {}, viewModel);
         geo = viewModel.station().geo;
-        if (geo) map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
+        if (geo) {
+          map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
+        }
         placemark = new YMaps.Placemark(map.getCenter(), {
           draggable: false,
           style: "default#storehouseIcon"
@@ -82,17 +85,13 @@
       });
     });
     LineModel = (function() {
-
       function LineModel(id, lines) {
         this.id = id;
         this.lines = lines;
       }
-
       return LineModel;
-
     })();
     ViewModel = (function() {
-
       function ViewModel() {
         this.id = ko.observable();
         this.key = ko.observable();
@@ -113,13 +112,11 @@
                             new LineModel n.id(), n.lines().map (x) => x.addr()
                       else
                         []
-        */
+                    */
         this.similarToggle = ko.observable(false);
         this.nearToggle = ko.observable(false);
       }
-
       return ViewModel;
-
     })();
     ko.bindingHandlers.toggle = {
       init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -138,5 +135,4 @@
     createSelector();
     return loadMap();
   });
-
 }).call(this);

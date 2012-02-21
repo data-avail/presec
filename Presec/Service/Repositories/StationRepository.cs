@@ -23,9 +23,20 @@ namespace Presec.Service.Repositories
         private static string[] premiseNamesWell = new[] { "дом", "строение", "корпус", "здание", "строение", "корпус", "дом" };
         private static string routeRegex = ".*({0}).*";
         private static string routeWithPremiseRegex = ".*({0}).*({1}).*";
+        private static string[][] routeMapping = new[] {
+             new[] { "к.", "корпус" },
+             new[] { "просп.", "проспект" }
+            };
+        private static string[][] premiseMapping = new[] {
+             new[] { "д.", "дом" },
+             new[] { "просп.", "проспект" }
+            };
+
 
         public Station GetOne(string key)
         {
+            var matchType = "not_found";
+
             if (!string.IsNullOrEmpty(key))
             {
                 var cache = new Cahching.Cache<Station>();
@@ -51,10 +62,22 @@ namespace Presec.Service.Repositories
                 if (!int.TryParse(key, out id))
                 {
                     found = GetAllByStrictSearch(collection, key, out foundPattern).OrderBy(p => p.boundary.Count());
+
+                    matchType = "similar";
+
+                    if (found.Count() == 0)
+                    {
+                        found = GetAllBySuggestion(collection, string.Format("Россия, Москва, {0}", key));
+
+                        matchType = "geo";
+                    }
+                    
                 }
                 else
                 {
                     found = collection.Find(Query.EQ("_id", id)).ToArray();
+
+                    matchType = "id";
                 }
 
                 var res = found.FirstOrDefault();
@@ -69,7 +92,7 @@ namespace Presec.Service.Repositories
                     {
                         key = key,
                         id = res._id,
-                        matchType = "similar" //similar, geo, id
+                        matchType = matchType //not_found, similar, geo, id
                     };
 
                     st.boundary = res.boundary.Select(s => new Line { addr = s, matches = foundPattern != null ? GetMatches(s, foundPattern).ToArray() : new MatchedSubstring[0] }).ToArray();
@@ -93,20 +116,26 @@ namespace Presec.Service.Repositories
                     };
 
                     st.near = near.Select(p => new Ref { id = p._id, descr = p.station.addr }).ToArray();
+                    if (matchType == "similar" && foundPattern != null)
+                    {
+                        st.similar = 
+                            similar.Select((p) =>
+                                {
+                                    var matches = p.boundary.Select(s => new { s = s, m = GetMatches(s, foundPattern).ToArray() }).Where(s => s.m.Count() != 0).ToArray();
+                                    return new RefLines { id = p._id, lines = matches.Select(x => new Line { addr = x.s, matches = x.m }).ToArray() };
 
-                    st.similar = foundPattern == null ? new RefLines[0] :
-                        similar.Select((p) => 
-                            {
-                                var matches = p.boundary.Select(s => new { s = s, m = GetMatches(s, foundPattern).ToArray() }).Where(s => s.m.Count() != 0).ToArray();
-                                return new RefLines { id = p._id, lines = matches.Select(x => new Line { addr = x.s, matches = x.m }).ToArray() };
-
-                            }).ToArray();
+                                }).ToArray();
+                    }
+                    else
+                    {
+                        st.similar = new RefLines[0];
+                    }
 
                     return st;
                 }
             }
 
-            return null;
+            return new Station { key = key, matchType = "not_found" };
         }
 
         private static IEnumerable<MatchedSubstring> GetMatches(string Str, string Pattern)
@@ -124,43 +153,6 @@ namespace Presec.Service.Repositories
 
         public IEnumerable<Station> GetAll(ODataQueryOperation operation)
         {
-            /*
-            var addr = operation.ContextParameters.ContainsKey("addr") ? operation.ContextParameters["addr"] : null;
-            var gref = operation.ContextParameters.ContainsKey("gref") ? operation.ContextParameters["gref"] : null;
-
-            if (!string.IsNullOrEmpty(addr))
-            {
-                
-                var connectionString = ConfigurationManager.AppSettings["MongoConnectionString"];
-
-                var hostName = Regex.Replace(connectionString, "^(.*)/(.*)$", "$1");
-                var dbName = Regex.Replace(connectionString, "^(.*)/(.*)$", "$2");
-
-
-                var server = MongoServer.Create(hostName);
-                server.Connect();
-                var db = server.GetDatabase(dbName);
-                var collection = db.GetCollection<Doc>("moscow");
-
-                var res = GetAllByStrictSearch(collection, addr);
-
-                if (res.Count() == 0)
-                {
-                    //strict condition not found
-
-                    //search by loosed
-
-                    //search by geo
-                    if (!string.IsNullOrEmpty(gref))
-                    {
-                        res = GetAllByGoogleRef(collection, gref);
-                    }
-                }
-
-                return this.Map(collection, res);
-            }
-             */
-
             return new Station[0];
         }
 
@@ -184,89 +176,43 @@ namespace Presec.Service.Repositories
             return Collection.Find(Query.Matches("boundary", BsonRegularExpression.Create(regex, "i"))).Take(5).ToArray();
         }
 
-        public IEnumerable<Doc> GetAllByGoogleRef(MongoCollection<Doc> Collection, string GoogleRef)
+        public IEnumerable<Doc> GetAllBySuggestion(MongoCollection<Doc> Collection, string Term)
         {
-            //https://maps.googleapis.com/maps/api/place/details/output?parameters
+            var geoSug = new GeoSuggestionRepository();
+            var sug = geoSug.GetOne(Term).suggestions.FirstOrDefault();
 
-
-            System.Net.WebClient client = new System.Net.WebClient();
-
-            // Add a user agent header in case the 
-            // requested URI contains a query.
-
-            client.QueryString.Add("reference", GoogleRef);
-            client.QueryString.Add("sensor", "false");
-            client.QueryString.Add("types", "geocode");
-            client.QueryString.Add("key", ConfigurationManager.AppSettings["GoogleAPIKey"]);
-
-
-            System.IO.Stream data = client.OpenRead("https://maps.googleapis.com/maps/api/place/details/xml");
-            System.IO.StreamReader reader = new System.IO.StreamReader(data);
-            string str = reader.ReadToEnd();
-
-            data.Close();
-            reader.Close();
-
-            XDocument xdoc = XDocument.Parse(str);
-            var status = xdoc.Root.Descendants("status").Single();
-            if (status.Value == "OK")
+            if (sug != null)
             {
-                var geoNode = xdoc.Root.Descendants("result").Single().Descendants("geometry").Single().Descendants("location").Single();
-                double lat = double.Parse(geoNode.Descendants("lat").Single().Value, CultureInfo.InvariantCulture);
-                double lng = double.Parse(geoNode.Descendants("lng").Single().Value, CultureInfo.InvariantCulture);
+                //http://geocode-maps.yandex.ru/1.x/?geocode=Москва,+Тверская+улица,+дом+7&key=API-ключ
+
+                System.Net.WebClient client = new System.Net.WebClient();
+                
+                client.QueryString.Add("geocode", sug.descr);
+                client.QueryString.Add("format", "xml");
+                client.QueryString.Add("key", ConfigurationManager.AppSettings["YMapAPIKey"]);
+
+                System.IO.Stream data = client.OpenRead("http://geocode-maps.yandex.ru/1.x");
+
+                System.IO.StreamReader reader = new System.IO.StreamReader(data);
+                string str = reader.ReadToEnd();
+
+                data.Close();
+                reader.Close();
+                
+                XDocument xdoc = XDocument.Parse(str);
+                
+                var geoNode = xdoc.Root.Descendants().Single(p=>p.Name == XName.Get("pos", "http://www.opengis.net/gml"));
+
+                var geo = geoNode.Value.Split(' ');
+                double lat = double.Parse(geo[0], CultureInfo.InvariantCulture);
+                double lng = double.Parse(geo[1], CultureInfo.InvariantCulture);
 
 
-                return Collection.Find(Query.Near("station.geo", lat, lng)).Take(6).ToArray();;
+                return Collection.Find(Query.Near("station.geo", lat, lng)).Take(6).ToArray(); 
             }
 
             return new Doc[0];
-
         }
-
-        /*
-
-        private IEnumerable<Station> Map(MongoCollection<Doc> Collection,  IEnumerable<Doc> Docs)
-        {
-            return Docs.ToArray().Select((p) =>
-            {
-                var st = new Station
-                {
-                    id = p._id
-                };
-
-                st.boundary = p.boundary.ToArray().Select(s => new Line { addr = s }).ToArray();
-
-                st.station = new Address
-                {
-                    addr = p.station.addr,
-                    aux = p.station.aux,
-                    org = p.station.org,
-                    phone = p.station.phone,
-                    geo = p.station.geo != null ? new GeoPoint { lat = p.station.geo[0], lon = p.station.geo[1] } : null
-                };
-
-                st.uik = new Address
-                {
-                    addr = p.uik.addr,
-                    aux = p.uik.aux,
-                    org = p.uik.org,
-                    phone = p.station.phone,
-                    geo = p.uik.geo != null ? new GeoPoint { lat = p.uik.geo[0], lon = p.uik.geo[1] } : null
-                };
-
-                if (st.station.geo != null)
-                {
-                    //var q1 = Collection.Find(Query.Near("station.geo", st.station.geo.lat, st.station.geo.lon, 5));
-
-                    //st.near = q1.Take(5).Select(s => new Station { id = s._id, boundary = s.boundary.Select(x => new Line { addr = x }).ToArray() }).ToArray();
-                }
-
-                return st;
-            });
-
-        }
-
-         */
 
 
         public string[] GetAddr(string RawAddr)
@@ -321,14 +267,19 @@ namespace Presec.Service.Repositories
 
             if (premisePart != null)
             {
-                var premiseRegex = string.Format(@"^(.*)\b({0})\s?(.*)", string.Join("|", premiseNames.Select(p => p.Replace(".", @"\.?"))));
+                var premiseRegex = string.Format(@"^({0})?\s?(\d+)(\s*({0})\s*(\d+))?$", string.Join("|", premiseNames.Select(p => p.Replace(".", @"\.?"))));
 
                 matches = Regex.Matches(premisePart, premiseRegex, RegexOptions.IgnoreCase);
                 if (matches.Count > 0)
                 {
-                    var well = GetPremiseWell(matches[0].Groups[2].Value);
-                    premisePart = Regex.Replace(premisePart, premiseRegex, "$1$3", RegexOptions.IgnoreCase).Trim();
-                    premisePart = well + "|" + premisePart;
+                    var well = GetPremiseWell(matches[0].Groups[1].Value);
+                    //premisePart = Regex.Replace(premisePart, premiseRegex, "$1$2|", RegexOptions.IgnoreCase).Trim();
+                    premisePart = well + "|" + matches[0].Groups[2].Value;
+                    if (matches[0].Groups[3].Success)
+                    {
+                        well = GetPremiseWell(matches[0].Groups[4].Value);
+                        premisePart = premisePart + "|" + well + "|" + matches[0].Groups[5].Value;
+                    }
                 }
                 else
                 {
@@ -341,14 +292,14 @@ namespace Presec.Service.Repositories
 
         private string GetRouteWell(string Route)
         {
-            var i = routeNames.Select(p => p.Trim('.')).ToList().IndexOf(Route.Trim('.'));
+            var i = routeNames.Select(p => p.Trim('.')).ToList().IndexOf(Route.ToLower().Trim('.'));
 
             return i != -1 ? routeNamesWell.ToArray()[i] : null;
         }
 
         private string GetPremiseWell(string Premise)
         {
-            var i = premiseNames.Select(p => p.Trim('.')).ToList().IndexOf(Premise.Trim('.'));
+            var i = premiseNames.Select(p => p.Trim('.')).ToList().IndexOf(Premise.ToLower().Trim('.'));
 
             return i != -1 ? premiseNamesWell.ToArray()[i] : null;
         }

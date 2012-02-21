@@ -90,9 +90,18 @@ namespace Presec.Service.Models
     }
 
     //http://code.google.com/apis/maps/documentation/places/autocomplete.html
-    [DataServiceKey("id")]
+    [DataServiceKey("term")]
     [Serializable]
     public class GeoSuggestion
+    {
+        public string term { get; set; }
+
+        public Suggestion[] suggestions { get; set; }
+    }
+
+    [DataServiceKey("id")]
+    [Serializable]
+    public class Suggestion
     {
         public string id { get; set; }
 
@@ -101,6 +110,7 @@ namespace Presec.Service.Models
         public string descr { get; set; }
 
         public string refer { get; set; }
+
     }
 
     [DataServiceKey("lat", "lon")]

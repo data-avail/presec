@@ -40,7 +40,8 @@ namespace Presec.Service.Repositories
             if (!string.IsNullOrEmpty(key))
             {
                 var cache = new Cahching.Cache<Station>();
-                Station station = cache.Get(key);
+                var k = Regex.Replace(key, @"[\s\.,;:]", "");
+                Station station = cache.Get(k);
                 if (station != null)
                     return station;
 
@@ -130,6 +131,8 @@ namespace Presec.Service.Repositories
                     {
                         st.similar = new RefLines[0];
                     }
+
+                    cache.Set(k, st);
 
                     return st;
                 }

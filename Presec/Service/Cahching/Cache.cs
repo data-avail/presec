@@ -21,20 +21,19 @@ namespace Presec.Service.Cahching
         private readonly MemcachedClient _client = null;
         private readonly bool _isActive = false;
 
-        public T Get(string term)
+        public T Get(string key)
         {
-
-            return _isActive ? _client.Get<T>(term) : default(T);
+            return _isActive ? _client.Get<T>(key) : default(T);
         }
 
-        public void Set(string term, T GeoSuggestion)
+        public void Set(string key, T val)
         {
-            if (_isActive) _client.Store(StoreMode.Add, term, GeoSuggestion);
+            if (_isActive) _client.Store(StoreMode.Add, key, val);
         }
 
-        public void Remove(string term)
+        public void Remove(string key)
         {
-            if (_isActive) _client.Remove(term);
+            if (_isActive) _client.Remove(key);
         }
         
 

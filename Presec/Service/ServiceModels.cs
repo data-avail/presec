@@ -7,26 +7,65 @@ using Microsoft.Data.Services.Toolkit.QueryModel;
 
 namespace Presec.Service.Models
 {
-    [DataServiceKey("id")]
+    [Serializable]
+    [DataServiceKey("key")]
     public class Station
     {
+        //id or sarch term
+        public string key { get; set; }
+
         public int id { get; set; }
 
-        public Line[] lines { get; set; }
+        public string matchType { get; set; } 
 
         public Address station { get; set; }
 
         public Address uik { get; set; }
 
-        public Station[] near { get; set; }
+        public Line[] boundary { get; set; }
+
+        public Ref[] near { get; set; }
+
+        public RefLines[] similar { get; set; }
     }
 
+    [Serializable]
     [DataServiceKey("addr")]
     public class Line
     {
         public string addr { get; set; }
+
+        public MatchedSubstring[] matches { get; set; }
     }
 
+    [Serializable]
+    [DataServiceKey("id")]
+    public class Ref
+    {
+        public int id { get; set; }
+
+        public string descr { get; set; }
+    }
+
+    [Serializable]
+    [DataServiceKey("id")]
+    public class RefLines
+    {
+        public int id { get; set; }
+
+        public Line[] lines { get; set; }
+    }
+
+    [Serializable]
+    [DataServiceKey("offset", "length")]
+    public class MatchedSubstring
+    {
+        public int offset { get; set; }
+
+        public int length { get; set; }
+    }
+
+    [Serializable]
     [DataServiceKey("addr")]
     public class Address
     {
@@ -41,6 +80,7 @@ namespace Presec.Service.Models
         public GeoPoint geo { get; set; }
     }
 
+    [Serializable]
     [DataServiceKey("lat", "lon")]
     public class GeoPoint
     {

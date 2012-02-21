@@ -21,14 +21,110 @@ namespace Presec.Service.Repositories
         private static string[] routeNamesWell = new[] { "улица", "площадь", "набережная", "проспект", "тупик", "шоссе", "проезд", "набережная", "улица", "проезд", "шоссе", "площадь" };
         private static string[] premiseNames = new[] { "дом", "строение", "корпус", "здание", "стр.", "к.", "д." };
         private static string[] premiseNamesWell = new[] { "дом", "строение", "корпус", "здание", "строение", "корпус", "дом" };
+        private static string routeRegex = ".*({0}).*";
+        private static string routeWithPremiseRegex = ".*({0}).*({1}).*";
 
-        public Station GetOne(string id)
+        public Station GetOne(string key)
         {
-            return new Station { id = 0 };
+            if (!string.IsNullOrEmpty(key))
+            {
+                var cache = new Cahching.Cache<Station>();
+                Station station = cache.Get(key);
+                if (station != null)
+                    return station;
+
+                int id;
+                var connectionString = ConfigurationManager.AppSettings["MongoConnectionString"];
+
+                var hostName = Regex.Replace(connectionString, "^(.*)/(.*)$", "$1");
+                var dbName = Regex.Replace(connectionString, "^(.*)/(.*)$", "$2");
+
+                var server = MongoServer.Create(hostName);
+                server.Connect();
+                var db = server.GetDatabase(dbName);
+                var collection = db.GetCollection<Doc>("moscow");
+
+                IEnumerable<Doc> found = null;
+
+                string foundPattern = null;
+
+                if (!int.TryParse(key, out id))
+                {
+                    found = GetAllByStrictSearch(collection, key, out foundPattern).OrderBy(p => p.boundary.Count());
+                }
+                else
+                {
+                    found = collection.Find(Query.EQ("_id", id)).ToArray();
+                }
+
+                var res = found.FirstOrDefault();
+
+                if (res != null)
+                {
+                    var similar = found.Where(p => p._id != res._id);
+
+                    var near = collection.Find(Query.Near("station.geo", res.station.geo[0], res.station.geo[1])).Take(6).ToArray().Where(p => p._id != res._id);
+
+                    var st = new Station
+                    {
+                        key = key,
+                        id = res._id,
+                        matchType = "similar" //similar, geo, id
+                    };
+
+                    st.boundary = res.boundary.Select(s => new Line { addr = s, matches = foundPattern != null ? GetMatches(s, foundPattern).ToArray() : new MatchedSubstring[0] }).ToArray();
+
+                    st.station = new Address
+                    {
+                        addr = res.station.addr,
+                        aux = res.station.aux,
+                        org = res.station.org,
+                        phone = res.station.phone,
+                        geo = res.station.geo != null ? new GeoPoint { lat = res.station.geo[0], lon = res.station.geo[1] } : null
+                    };
+
+                    st.uik = new Address
+                    {
+                        addr = res.uik.addr,
+                        aux = res.uik.aux,
+                        org = res.uik.org,
+                        phone = res.station.phone,
+                        geo = res.uik.geo != null ? new GeoPoint { lat = res.uik.geo[0], lon = res.uik.geo[1] } : null
+                    };
+
+                    st.near = near.Select(p => new Ref { id = p._id, descr = p.station.addr }).ToArray();
+
+                    st.similar = foundPattern == null ? new RefLines[0] :
+                        similar.Select((p) => 
+                            {
+                                var matches = p.boundary.Select(s => new { s = s, m = GetMatches(s, foundPattern).ToArray() }).Where(s => s.m.Count() != 0).ToArray();
+                                return new RefLines { id = p._id, lines = matches.Select(x => new Line { addr = x.s, matches = x.m }).ToArray() };
+
+                            }).ToArray();
+
+                    return st;
+                }
+            }
+
+            return null;
+        }
+
+        private static IEnumerable<MatchedSubstring> GetMatches(string Str, string Pattern)
+        {
+            var matches = Regex.Matches(Str, Pattern, RegexOptions.IgnoreCase);
+            if (matches.Count > 0)
+            {
+                var groups = matches[0].Groups;
+                for (int i = 1; i < groups.Count; i++)
+                {
+                    yield return new MatchedSubstring { offset = groups[i].Index, length = groups[i].Length };
+                }
+            }
         }
 
         public IEnumerable<Station> GetAll(ODataQueryOperation operation)
         {
+            /*
             var addr = operation.ContextParameters.ContainsKey("addr") ? operation.ContextParameters["addr"] : null;
             var gref = operation.ContextParameters.ContainsKey("gref") ? operation.ContextParameters["gref"] : null;
 
@@ -59,16 +155,16 @@ namespace Presec.Service.Repositories
                     {
                         res = GetAllByGoogleRef(collection, gref);
                     }
-
                 }
 
                 return this.Map(collection, res);
             }
+             */
 
             return new Station[0];
         }
 
-        public IEnumerable<Doc> GetAllByStrictSearch(MongoCollection<Doc> Collection, string Addr)
+        public IEnumerable<Doc> GetAllByStrictSearch(MongoCollection<Doc> Collection, string Addr, out string FoundPattern)
         {
             var spts = GetAddr(Addr);
 
@@ -76,12 +172,14 @@ namespace Presec.Service.Repositories
 
             if (spts[1] == null)
             {
-                regex = string.Format(".*{0}.*", spts[0].Split('|')[1]);
+                regex = string.Format(routeRegex, spts[0].Split('|')[1]);
             }
             else
             {
-                regex = string.Format(@".*{0}.*{1}.*", spts[0].Split('|')[1], spts[1].Split('|')[1]);
+                regex = string.Format(routeWithPremiseRegex, spts[0].Split('|')[1], spts[1].Split('|')[1]);
             }
+
+            FoundPattern = regex;
 
             return Collection.Find(Query.Matches("boundary", BsonRegularExpression.Create(regex, "i"))).Take(5).ToArray();
         }
@@ -118,12 +216,14 @@ namespace Presec.Service.Repositories
                 double lng = double.Parse(geoNode.Descendants("lng").Single().Value, CultureInfo.InvariantCulture);
 
 
-                return Collection.Find(Query.Near("station.geo", lat, lng)).Take(5).ToArray();;
+                return Collection.Find(Query.Near("station.geo", lat, lng)).Take(6).ToArray();;
             }
 
             return new Doc[0];
 
         }
+
+        /*
 
         private IEnumerable<Station> Map(MongoCollection<Doc> Collection,  IEnumerable<Doc> Docs)
         {
@@ -134,7 +234,7 @@ namespace Presec.Service.Repositories
                     id = p._id
                 };
 
-                st.lines = p.boundary.ToArray().Select(s => new Line { addr = s }).ToArray();
+                st.boundary = p.boundary.ToArray().Select(s => new Line { addr = s }).ToArray();
 
                 st.station = new Address
                 {
@@ -156,15 +256,17 @@ namespace Presec.Service.Repositories
 
                 if (st.station.geo != null)
                 {
-                    var q1 = Collection.Find(Query.Near("station.geo", st.station.geo.lat, st.station.geo.lon, 5));
+                    //var q1 = Collection.Find(Query.Near("station.geo", st.station.geo.lat, st.station.geo.lon, 5));
 
-                    st.near = q1.Take(5).Select(s => new Station { id = s._id, lines = s.boundary.Select(x => new Line { addr = x }).ToArray() }).ToArray();
+                    //st.near = q1.Take(5).Select(s => new Station { id = s._id, boundary = s.boundary.Select(x => new Line { addr = x }).ToArray() }).ToArray();
                 }
 
                 return st;
             });
 
         }
+
+         */
 
 
         public string[] GetAddr(string RawAddr)

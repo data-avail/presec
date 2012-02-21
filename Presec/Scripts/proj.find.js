@@ -1,5 +1,5 @@
 (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   $(function() {
     var LineModel, ViewModel, createMap, createSelector, gCollection, loadMap, map, viewModel;
     map = null;
@@ -23,9 +23,7 @@
             style: "default#storehouseIcon"
           });
           txt = this.descr;
-          if (this.count > 1) {
-            txt = "" + txt + " (" + this.count + ")";
-          }
+          if (this.count > 1) txt = "" + txt + " (" + this.count + ")";
           placemark.id = placemark.name = placemark.description = txt;
           return gCollection.add(placemark);
         });
@@ -71,73 +69,51 @@
       var gref, search;
       search = $("#search_field").val();
       gref = $("#search_field").data("gref");
-      return OData.read("/Service/PresecService.svc/Stations?addr=" + search + "&gref=" + gref + "&$expand=lines,near/lines", function(data) {
+      return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches", function(data) {
         var geo, placemark;
         ko.mapping.fromJS(data, {}, viewModel);
-        viewModel.search(search);
-        if (viewModel.first()) {
-          geo = viewModel.first().station.geo;
-          if (geo) {
-            map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
-          }
-          placemark = new YMaps.Placemark(map.getCenter(), {
-            draggable: false,
-            style: "default#storehouseIcon"
-          });
-          return map.addOverlay(placemark);
-        }
+        geo = viewModel.geo;
+        if (geo) map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
+        placemark = new YMaps.Placemark(map.getCenter(), {
+          draggable: false,
+          style: "default#storehouseIcon"
+        });
+        return map.addOverlay(placemark);
       });
     });
     LineModel = (function() {
+
       function LineModel(id, lines) {
         this.id = id;
         this.lines = lines;
       }
+
       return LineModel;
+
     })();
     ViewModel = (function() {
+
       function ViewModel() {
         this.search = ko.observable();
-        this.results = ko.observableArray();
-        this.first = ko.computed(__bind(function() {
-          return this.results()[0];
-        }, this));
-        this.similars = ko.computed(__bind(function() {
-          var r, _i, _len, _ref, _results;
-          _ref = this.results().filter(__bind(function(x) {
-            return x !== this.results()[0];
-          }, this));
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            r = _ref[_i];
-            _results.push(new LineModel(r.id(), r.lines().filter(__bind(function(x) {
-              return new RegExp(".*" + (this.search()) + ".*", "i").test(x.addr());
-            }, this)).map(__bind(function(x) {
-              return x.addr();
-            }, this))));
-          }
-          return _results;
-        }, this));
-        this.near = ko.computed(__bind(function() {
-          var n, _i, _len, _ref, _results;
-          if (this.first()) {
-            _ref = this.first().near();
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              n = _ref[_i];
-              _results.push(new LineModel(n.id(), n.lines().map(__bind(function(x) {
-                return x.addr();
-              }, this))));
-            }
-            return _results;
-          } else {
-            return [];
-          }
-        }, this));
+        /*
+                    @results = ko.observableArray()
+                    @first = ko.computed => @results()[0]
+                    @similars = ko.computed =>
+                      for r in @results().filter((x) => x != @results()[0])
+                        new LineModel r.id(), r.lines().filter((x) => new RegExp(".*" + (@search()) + ".*", "i").test(x.addr())).map((x)=>x.addr())
+                    @near = ko.computed =>
+                      if @first()
+                        for n in @first().near()
+                            new LineModel n.id(), n.lines().map (x) => x.addr()
+                      else
+                        []
+        */
         this.similarToggle = ko.observable(false);
         this.nearToggle = ko.observable(false);
       }
+
       return ViewModel;
+
     })();
     ko.bindingHandlers.toggle = {
       init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -156,4 +132,5 @@
     createSelector();
     return loadMap();
   });
+
 }).call(this);

@@ -46,14 +46,12 @@ $ ->
     $("#search_button").click ->
         search = $("#search_field").val()
         gref = $("#search_field").data "gref"
-        OData.read "/Service/PresecService.svc/Stations?addr=#{search}&gref=#{gref}&$expand=lines,near/lines", (data) ->
+        OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches", (data) ->
           ko.mapping.fromJS data, {}, viewModel
-          viewModel.search search
-          if viewModel.first()
-            geo = viewModel.first().station.geo
-            if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
-            placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#storehouseIcon"}
-            map.addOverlay placemark
+          geo = viewModel.geo
+          if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
+          placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#storehouseIcon"}
+          map.addOverlay placemark
 
     class LineModel
       constructor:(@id, @lines) ->
@@ -61,6 +59,7 @@ $ ->
     class ViewModel
         constructor: ->
             @search = ko.observable()
+            ###
             @results = ko.observableArray()
             @first = ko.computed => @results()[0]
             @similars = ko.computed =>
@@ -72,6 +71,7 @@ $ ->
                     new LineModel n.id(), n.lines().map (x) => x.addr()
               else
                 []
+            ###
             @similarToggle = ko.observable false
             @nearToggle = ko.observable false
 

@@ -68,6 +68,30 @@ namespace Presec
             }
         }
 
+        public IQueryable<Ref> Refs
+        {
+            get
+            {
+                return base.CreateQuery<Ref>();
+            }
+        }
+
+        public IQueryable<RefLines> RefLineses
+        {
+            get
+            {
+                return base.CreateQuery<RefLines>();
+            }
+        }
+
+        public IQueryable<MatchedSubstring> MatchedSubstrings
+        {
+            get
+            {
+                return base.CreateQuery<MatchedSubstring>();
+            }
+        }
+
 
         public override object RepositoryFor(string fullTypeName)
         {

@@ -73,6 +73,7 @@ namespace Presec.Test
         /// <summary>
         ///Check all stations for addresses like винокур
         ///</summary>
+        /*
         [TestMethod()]
         public void GetAllByAddr_винокур()
         {
@@ -89,6 +90,7 @@ namespace Presec.Test
 
             
         }
+         */
 
         /// <summary>
         ///Check all stations for addresses like ник
@@ -97,12 +99,10 @@ namespace Presec.Test
         public void GetAllByAddr_ник()
         {
             StationRepository target = new StationRepository();
-            ODataQueryOperation operation = new ODataQueryOperation();
-            operation.ContextParameters = new Dictionary<string, string>();
-            operation.ContextParameters.Add("addr", "ник");
-            IEnumerable<Station> actual;
-            actual = target.GetAll(operation);
-            Assert.AreEqual(5, actual.Count());
+            Station actual;
+            actual = target.GetOne("ник");
+            Assert.AreNotEqual(null, actual);
+            Assert.AreEqual(4, actual.similar.Count());
         }
 
 
@@ -113,12 +113,9 @@ namespace Presec.Test
         public void GetAllByAddrNotFound()
         {
             StationRepository target = new StationRepository();
-            ODataQueryOperation operation = new ODataQueryOperation();
-            operation.ContextParameters = new Dictionary<string, string>();
-            operation.ContextParameters.Add("addr", "гебельс");
-            IEnumerable<Station> actual;
-            actual = target.GetAll(operation);
-            Assert.AreEqual(0, actual.Count());
+            Station actual;
+            actual = target.GetOne("гебельс");
+            Assert.AreEqual(null, actual);
         }
 
         [TestMethod()]
@@ -252,6 +249,7 @@ namespace Presec.Test
         [TestMethod()]
         public void GetByGoogleRef_лисичанская()
         {
+            /*
             //ClRBAAAA8fiTTf0qlAtK1NnUblpdGtY5T_se4KtvLvxTJNjs2FnIIWK2TDgNdRcgEps1NCdPNTrHv3k1GOXlrnCvjVdGLBs_H_ToMeNfZ3MxZsqmIpgSEHm3jvB1DyRNfk0iVWaRgVkaFCmpKkegcbJuY17m_yrg9a5xzLuA
             StationRepository target = new StationRepository();
             ODataQueryOperation operation = new ODataQueryOperation();
@@ -261,6 +259,7 @@ namespace Presec.Test
             IEnumerable<Station> actual;
             actual = target.GetAll(operation);
             Assert.AreEqual(5, actual.Count());
+             */
 
         }
 
@@ -281,6 +280,20 @@ namespace Presec.Test
             Assert.AreEqual(8, actual.coords.Count());
 
         }
+
+        [TestMethod()]
+        public void FindOne_винокур()
+        {
+            StationRepository target = new StationRepository();
+            var actual = target.GetOne("винокур");
+            Assert.AreNotEqual(null, actual);
+            Assert.AreEqual(1, actual.similar.Count());
+            Assert.AreEqual(2173, actual.id);
+            Assert.AreEqual(2174, actual.similar[0].id);
+            Assert.AreEqual(5, actual.near.Count());
+        }
+
+
 
     }
 }

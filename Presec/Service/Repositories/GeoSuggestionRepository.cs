@@ -52,7 +52,12 @@ namespace Presec.Service.Repositories
                                 id = p.Descendants("id").Single().Value,
                                 descr = p.Descendants("description").Single().Value,
                                 refer = p.Descendants("reference").Single().Value,
-                                term = p.Descendants("term").Descendants("value").First().Value
+                                term = p.Descendants("term").Descendants("value").First().Value,
+                                match = new MatchedSubstring
+                                {
+                                    offset = int.Parse(p.Descendants("matched_substring").First().Descendants("offset").Single().Value),
+                                    length = int.Parse(p.Descendants("matched_substring").First().Descendants("length").Single().Value)
+                                }
                             }).ToArray();
                     geoSug = new GeoSuggestion { term = term, suggestions = suggestions };
 

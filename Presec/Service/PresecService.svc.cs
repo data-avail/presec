@@ -101,6 +101,14 @@ namespace Presec
             }
         }
 
+        public IQueryable<FoundBy> FoundBys
+        {
+            get
+            {
+                return base.CreateQuery<FoundBy>();
+            }
+        }
+
 
         public override object RepositoryFor(string fullTypeName)
         {

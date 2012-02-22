@@ -27,6 +27,18 @@ namespace Presec.Service.Models
         public Ref[] near { get; set; }
 
         public RefLines[] similar { get; set; }
+
+        //used only if matchType == geo
+        public FoundBy foundBy { get; set; }
+    }
+
+    [Serializable]
+    [DataServiceKey("point")]
+    public class FoundBy
+    {
+        public Line found { get; set; }
+
+        public GeoPoint point { get; set; }
     }
 
     [Serializable]
@@ -110,6 +122,8 @@ namespace Presec.Service.Models
         public string descr { get; set; }
 
         public string refer { get; set; }
+
+        public MatchedSubstring match { get; set; }
 
     }
 

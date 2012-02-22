@@ -57,6 +57,7 @@ namespace Presec.Service.Repositories
                 var collection = db.GetCollection<Doc>("moscow");
 
                 IEnumerable<Doc> found = null;
+                FoundBy foundBy = null;
 
                 string foundPattern = null;
 
@@ -68,7 +69,7 @@ namespace Presec.Service.Repositories
 
                     if (found.Count() == 0)
                     {
-                        found = GetAllBySuggestion(collection, string.Format("Россия, Москва, {0}", key));
+                        found = GetAllBySuggestion(collection, string.Format("Россия, Москва, {0}", key), out foundBy);
 
                         matchType = "geo";
                     }
@@ -93,7 +94,8 @@ namespace Presec.Service.Repositories
                     {
                         key = key,
                         id = res._id,
-                        matchType = matchType //not_found, similar, geo, id
+                        matchType = matchType, //not_found, similar, geo, id
+                        foundBy = foundBy
                     };
 
                     st.boundary = res.boundary.Select(s => new Line { addr = s, matches = foundPattern != null ? GetMatches(s, foundPattern).ToArray() : new MatchedSubstring[0] }).ToArray();
@@ -179,15 +181,14 @@ namespace Presec.Service.Repositories
             return Collection.Find(Query.Matches("boundary", BsonRegularExpression.Create(regex, "i"))).Take(5).ToArray();
         }
 
-        public IEnumerable<Doc> GetAllBySuggestion(MongoCollection<Doc> Collection, string Term)
+        public IEnumerable<Doc> GetAllBySuggestion(MongoCollection<Doc> Collection, string Term, out FoundBy FoundBy)
         {
+            FoundBy = null;
             var geoSug = new GeoSuggestionRepository();
             var sug = geoSug.GetOne(Term).suggestions.FirstOrDefault();
 
             if (sug != null)
             {
-                //http://geocode-maps.yandex.ru/1.x/?geocode=Москва,+Тверская+улица,+дом+7&key=API-ключ
-
                 System.Net.WebClient client = new System.Net.WebClient();
                 
                 client.QueryString.Add("geocode", sug.descr);
@@ -210,6 +211,7 @@ namespace Presec.Service.Repositories
                 double lat = double.Parse(geo[0], CultureInfo.InvariantCulture);
                 double lng = double.Parse(geo[1], CultureInfo.InvariantCulture);
 
+                FoundBy = new FoundBy { found = new Line { addr = sug.descr, matches = new MatchedSubstring [] { sug.match }}, point = new GeoPoint { lat = lat, lon = lng } };
 
                 return Collection.Find(Query.Near("station.geo", lat, lng)).Take(6).ToArray(); 
             }

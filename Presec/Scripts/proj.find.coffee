@@ -20,6 +20,9 @@ $ ->
           placemark.id = placemark.name = placemark.description = txt
           if fCollection.filter((x) -> x._point.equals placemark._point).length == 0
             gCollection.add placemark
+            if @type == 2
+                YMaps.Events.observe placemark, placemark.Events.Click, (prk) ->
+                  findStation prk.id
 
   createMap = ->
     map = new YMaps.Map $("#map")[0]
@@ -38,7 +41,9 @@ $ ->
       placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#attentionIcon"}
       placemark.id = placemark.name = placemark.description = viewModel.id()
       fCollection.add placemark
-
+      YMaps.Events.observe placemark, placemark.Events.Click, (prk) ->
+        findStation prk.id
+     
   createSelector = ->
       $("#search_field").autocomplete
         minLength : 3,

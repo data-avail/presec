@@ -133,6 +133,9 @@ namespace Presec.Service.Models
     [Serializable]
     public class MapCoord
     {
+        //0 - city, 1 - district, 2 - street
+        public int type { get; set; }
+
         public double lat { get; set; }
 
         public double lon { get; set; }

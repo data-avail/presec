@@ -30,7 +30,12 @@
           if (fCollection.filter(function(x) {
             return x._point.equals(placemark._point);
           }).length === 0) {
-            return gCollection.add(placemark);
+            gCollection.add(placemark);
+            if (this.type === 2) {
+              return YMaps.Events.observe(placemark, placemark.Events.Click, function(prk) {
+                return findStation(prk.id);
+              });
+            }
           }
         });
       });
@@ -59,7 +64,10 @@
           style: "default#attentionIcon"
         });
         placemark.id = placemark.name = placemark.description = viewModel.id();
-        return fCollection.add(placemark);
+        fCollection.add(placemark);
+        return YMaps.Events.observe(placemark, placemark.Events.Click, function(prk) {
+          return findStation(prk.id);
+        });
       });
     };
     createSelector = function() {

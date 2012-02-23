@@ -57,7 +57,7 @@ namespace Presec.Service.Repositories
                 {
                     var districts = collection.Find(Query.And(Query.NE("parent", BsonType.Null), Query.Exists("district", true)));
 
-                    coords = districts.Select(p => new MapCoord { lat = p.geo != null ? p.geo[0] : 0.0 , lon = p.geo != null ? p.geo[1] : 0.0, count = p.crn != null ? p.crn.Count() : 0, descr = p.district }).ToArray();
+                    coords = districts.Select(p => new MapCoord { type = 1,  lat = p.geo != null ? p.geo[0] : 0.0 , lon = p.geo != null ? p.geo[1] : 0.0, count = p.crn != null ? p.crn.Count() : 0, descr = p.district }).ToArray();
                 }
 
                 cache.Set("district", coords);
@@ -68,7 +68,7 @@ namespace Presec.Service.Repositories
                 
                 var districts = collection.Find(Query.In("parent", regions.Select(p=> BsonValue.Create(p._id)))).ToArray();
 
-                var distrCounts = districts.Select(p => new { id = p._id, parent = p.parent, count = p.crn != null ? p.crn.Count() : 0 });
+                var distrCounts = districts.Select(p => new { type = 0, id = p._id, parent = p.parent, count = p.crn != null ? p.crn.Count() : 0 });
 
                 coords = regions.Select(p =>
                     new MapCoord { lat = p.geo != null ? p.geo[0] : 0.0, lon = p.geo != null ? p.geo[1] : 0.0, count = (int)distrCounts.Where(x => x.parent == p._id).Sum(x => x.count), descr = p.district }).ToArray();
@@ -82,7 +82,7 @@ namespace Presec.Service.Repositories
             {
                 var q = collection.Find(Query.And(geo, Query.Exists("station", true)));
 
-                coords = q.Select(p => new MapCoord { lat = p.station.geo != null ? p.station.geo[0] : 0.0, lon = p.station.geo != null ? p.station.geo[1] : 0.0, count = 1, descr = p._id.ToString() }).ToArray();
+                coords = q.Select(p => new MapCoord { type = 2, lat = p.station.geo != null ? p.station.geo[0] : 0.0, lon = p.station.geo != null ? p.station.geo[1] : 0.0, count = 1, descr = p._id.ToString() }).ToArray();
             }
             else 
             {

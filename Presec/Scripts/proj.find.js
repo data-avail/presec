@@ -1,8 +1,9 @@
 (function() {
   $(function() {
-    var LineModel, ViewModel, createMap, createSelector, gCollection, loadMap, map, viewModel;
+    var LineModel, ViewModel, createMap, createSelector, fCollection, gCollection, loadMap, map, viewModel;
     map = null;
     gCollection = new YMaps.GeoObjectCollection();
+    fCollection = new YMaps.GeoObjectCollection();
     loadMap = function() {
       var bounds, id, zoom;
       bounds = map.getBounds();
@@ -26,7 +27,11 @@
             txt = "" + txt + " (" + this.count + ")";
           }
           placemark.id = placemark.name = placemark.description = txt;
-          return gCollection.add(placemark);
+          if (fCollection.filter(function(x) {
+            return x._point.equals(placemark._point);
+          }).length === 0) {
+            return gCollection.add(placemark);
+          }
         });
       });
     };
@@ -35,6 +40,7 @@
       map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
       map.enableScrollZoom();
       map.addOverlay(gCollection);
+      map.addOverlay(fCollection);
       return YMaps.Events.observe(map, map.Events.BoundsChange, function(object) {
         return loadMap();
       });
@@ -53,9 +59,6 @@
               };
             }));
           });
-        },
-        select: function(e, ui) {
-          return $(this).data("gref", ui.item.gref);
         }
       });
       return $("#search_field").keypress(function(e) {
@@ -67,9 +70,9 @@
     };
     $(".toggle_layout").hide();
     $("#search_button").click(function() {
-      var gref, search;
+      var search;
+      fCollection.removeAll();
       search = $("#search_field").val();
-      gref = $("#search_field").data("gref");
       return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches", function(data) {
         var geo, placemark;
         ko.mapping.fromJS(data, {}, viewModel);
@@ -79,9 +82,10 @@
         }
         placemark = new YMaps.Placemark(map.getCenter(), {
           draggable: false,
-          style: "default#storehouseIcon"
+          style: "default#attentionIcon"
         });
-        return map.addOverlay(placemark);
+        placemark.id = placemark.name = placemark.description = viewModel.id();
+        return fCollection.add(placemark);
       });
     });
     LineModel = (function() {

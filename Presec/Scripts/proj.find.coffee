@@ -1,6 +1,7 @@
 $ ->
   map = null
   gCollection = new YMaps.GeoObjectCollection()
+  fCollection = new YMaps.GeoObjectCollection()
 
   loadMap = ->
     bounds = map.getBounds()
@@ -17,13 +18,15 @@ $ ->
           txt = @descr
           if @count > 1 then txt = "#{txt} (#{@count})"
           placemark.id = placemark.name = placemark.description = txt
-          gCollection.add placemark
+          if fCollection.filter((x) -> x._point.equals placemark._point).length == 0
+            gCollection.add placemark
 
   createMap = ->
     map = new YMaps.Map $("#map")[0]
     map.setCenter new YMaps.GeoPoint(37.64, 55.76), 10
     map.enableScrollZoom()
     map.addOverlay gCollection
+    map.addOverlay fCollection
     YMaps.Events.observe map, map.Events.BoundsChange, (object) -> loadMap()
 
   createSelector = ->
@@ -33,8 +36,6 @@ $ ->
         source: (req, res) ->
           OData.read "/Service/PresecService.svc/GeoSuggestions('россия, москва, #{req.term}')?$expand=suggestions", (data) ->
               res data.suggestions.map( (x)-> label : x.descr, value : x.term, gref : x.refer )
-        select: (e, ui) ->
-             $(@).data "gref", ui.item.gref
 
       $("#search_field").keypress (e) ->
         if(e.keyCode == 13)
@@ -44,14 +45,15 @@ $ ->
     $(".toggle_layout").hide()
     #events
     $("#search_button").click ->
+        fCollection.removeAll()
         search = $("#search_field").val()
-        gref = $("#search_field").data "gref"
         OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches", (data) ->
           ko.mapping.fromJS data, {}, viewModel
           geo = viewModel.station().geo
           if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
-          placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#storehouseIcon"}
-          map.addOverlay placemark
+          placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#attentionIcon"}
+          placemark.id = placemark.name = placemark.description = viewModel.id()
+          fCollection.add placemark
 
     class LineModel
       constructor:(@id, @lines) ->

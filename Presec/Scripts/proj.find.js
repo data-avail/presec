@@ -1,9 +1,36 @@
 (function() {
   $(function() {
-    var LineModel, ViewModel, createMap, createSelector, fCollection, findStation, gCollection, loadMap, map, viewModel;
+    var LineModel, ViewModel, createMap, createSelector, fCollection, findStation, gCollection, ini, iniStationPlacemark, loadMap, map, viewModel;
     map = null;
     gCollection = new YMaps.GeoObjectCollection();
     fCollection = new YMaps.GeoObjectCollection();
+    ini = function() {
+      var gStyle, hStyle, sStyle;
+      gStyle = new YMaps.Style();
+      gStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place agreg">$[iconContent]</div>'));
+      gStyle.iconStyle.offset = new YMaps.Point(-20, -40);
+      sStyle = new YMaps.Style();
+      sStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place station">$[iconContent]</div>'));
+      sStyle.iconStyle.offset = new YMaps.Point(-20, -40);
+      hStyle = new YMaps.Style();
+      hStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place home">$[iconContent]</div>'));
+      hStyle.iconStyle.offset = new YMaps.Point(-20, -40);
+      YMaps.Styles.add("user#agreg", gStyle);
+      YMaps.Styles.add("user#station", sStyle);
+      YMaps.Styles.add("user#home", hStyle);
+      return YMaps.Placemark.prototype.setCustomIconContent = function(content) {
+        this.iconContent = content;
+        return this.update();
+      };
+    };
+    iniStationPlacemark = function(placemark, id) {
+      placemark.id = id;
+      placemark.name = "Участок: " + id;
+      placemark.setCustomIconContent(id);
+      return YMaps.Events.observe(placemark, placemark.Events.Click, function(prk) {
+        return findStation(prk.id);
+      });
+    };
     loadMap = function() {
       var bounds, id, zoom;
       bounds = map.getBounds();
@@ -14,28 +41,30 @@
         zoom = "district";
       }
       id = "" + bounds._left + ";" + bounds._bottom + ";" + bounds._right + ";" + bounds._top + ";" + zoom;
+      gCollection.removeAll();
       return OData.read("/Service/PresecService.svc/MapRegions('" + id + "')?$expand=coords", function(result) {
-        gCollection.removeAll();
         return $(result.coords).each(function() {
-          var placemark, txt;
-          placemark = new YMaps.Placemark(new YMaps.GeoPoint(this.lat, this.lon), {
-            draggable: false,
-            style: "default#storehouseIcon"
-          });
-          txt = this.descr;
-          if (this.count > 1) {
-            txt = "" + txt + " (" + this.count + ")";
+          var placemark, style;
+          if (this.type === 2) {
+            id = this.descr;
           }
-          placemark.id = placemark.name = placemark.description = txt;
           if (fCollection.filter(function(x) {
-            return x._point.equals(placemark._point);
+            return x.id.toString() === id;
           }).length === 0) {
-            gCollection.add(placemark);
-            if (this.type === 2) {
-              return YMaps.Events.observe(placemark, placemark.Events.Click, function(prk) {
-                return findStation(prk.id);
-              });
+            style = this.type !== 2 ? "user#agreg" : "user#station";
+            placemark = new YMaps.Placemark(new YMaps.GeoPoint(this.lat, this.lon), {
+              draggable: false,
+              hideIcon: false,
+              style: style
+            });
+            if (this.type !== 2) {
+              placemark.name = this.descr;
+              placemark.description = "Всего участков: " + this.count;
+              placemark.setCustomIconContent(this.count);
+            } else {
+              iniStationPlacemark(placemark, id);
             }
+            return gCollection.add(placemark);
           }
         });
       });
@@ -61,13 +90,10 @@
         }
         placemark = new YMaps.Placemark(map.getCenter(), {
           draggable: false,
-          style: "default#attentionIcon"
+          style: "user#home"
         });
-        placemark.id = placemark.name = placemark.description = viewModel.id();
-        fCollection.add(placemark);
-        return YMaps.Events.observe(placemark, placemark.Events.Click, function(prk) {
-          return findStation(prk.id);
-        });
+        iniStationPlacemark(placemark, viewModel.id());
+        return fCollection.add(placemark);
       });
     };
     createSelector = function() {
@@ -136,6 +162,7 @@
     };
     viewModel = new ViewModel();
     ko.applyBindings(viewModel);
+    ini();
     createMap();
     createSelector();
     return loadMap();

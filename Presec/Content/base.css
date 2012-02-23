@@ -1,0 +1,26 @@
+﻿.place
+{
+    background-repeat:no-repeat;
+    width: 35px;
+    height: 35px;    
+    text-align: center;
+    font-weight:bold;
+    margin-top: 30px;
+    padding-top: 8px;
+    color:ButtonText;
+}
+
+.agreg
+{
+    background-image: url('/Content/images/agreg-middle.png');
+}
+
+.station
+{
+    background-image: url('/Content/images/station.png');
+}
+
+.home
+{
+    background-image: url('/Content/images/home.png');
+}

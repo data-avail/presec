@@ -3,6 +3,32 @@ $ ->
   gCollection = new YMaps.GeoObjectCollection()
   fCollection = new YMaps.GeoObjectCollection()
 
+  ini = ->
+      gStyle = new YMaps.Style()
+      gStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place agreg">$[iconContent]</div>'))
+      gStyle.iconStyle.offset = new YMaps.Point -20, -40
+      sStyle = new YMaps.Style()
+      sStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place station">$[iconContent]</div>'))
+      sStyle.iconStyle.offset = new YMaps.Point -20, -40
+      hStyle = new YMaps.Style()
+      hStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place home">$[iconContent]</div>'))
+      hStyle.iconStyle.offset = new YMaps.Point -20, -40
+
+      YMaps.Styles.add "user#agreg", gStyle
+      YMaps.Styles.add "user#station", sStyle
+      YMaps.Styles.add "user#home", hStyle
+    
+      YMaps.Placemark.prototype.setCustomIconContent = (content) ->
+        @iconContent = content
+        @update()
+
+  iniStationPlacemark = (placemark, id) ->
+    placemark.id = id
+    placemark.name = "Участок: " + id
+    placemark.setCustomIconContent id
+    YMaps.Events.observe placemark, placemark.Events.Click, (prk) ->
+      findStation prk.id
+
   loadMap = ->
     bounds = map.getBounds()
     zoom = "street"
@@ -11,18 +37,20 @@ $ ->
     else if map.getZoom() <= 13
       zoom = "district"
     id = "#{bounds._left};#{bounds._bottom};#{bounds._right};#{bounds._top};#{zoom}"
+    gCollection.removeAll()
     OData.read "/Service/PresecService.svc/MapRegions('#{id}')?$expand=coords", (result) ->
-        gCollection.removeAll()
         $(result.coords).each ->
-          placemark = new YMaps.Placemark new YMaps.GeoPoint(@lat, @lon), {draggable: false, style : "default#storehouseIcon"}
-          txt = @descr
-          if @count > 1 then txt = "#{txt} (#{@count})"
-          placemark.id = placemark.name = placemark.description = txt
-          if fCollection.filter((x) -> x._point.equals placemark._point).length == 0
+          id = @descr if @type == 2
+          if fCollection.filter((x) -> x.id.toString() == id).length == 0
+            style = if @type != 2 then "user#agreg" else "user#station"
+            placemark = new YMaps.Placemark new YMaps.GeoPoint(@lat, @lon), {draggable: false, hideIcon: false, style : style}
+            if @type != 2
+                placemark.name = @descr
+                placemark.description = "Всего участков: " + @count
+                placemark.setCustomIconContent @count
+            else
+                iniStationPlacemark placemark, id
             gCollection.add placemark
-            if @type == 2
-                YMaps.Events.observe placemark, placemark.Events.Click, (prk) ->
-                  findStation prk.id
 
   createMap = ->
     map = new YMaps.Map $("#map")[0]
@@ -38,11 +66,9 @@ $ ->
       ko.mapping.fromJS data, {}, viewModel
       geo = viewModel.station().geo
       if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
-      placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#attentionIcon"}
-      placemark.id = placemark.name = placemark.description = viewModel.id()
+      placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "user#home"}
+      iniStationPlacemark placemark, viewModel.id()
       fCollection.add placemark
-      YMaps.Events.observe placemark, placemark.Events.Click, (prk) ->
-        findStation prk.id
      
   createSelector = ->
       $("#search_field").autocomplete
@@ -58,7 +84,6 @@ $ ->
           $("#search_button").click()
 
     $(".toggle_layout").hide()
-
 
     $("#search_button").click ->
         findStation $("#search_field").val()
@@ -95,6 +120,7 @@ $ ->
 
     ko.applyBindings viewModel
 
+    ini()
     createMap()
     createSelector()
     loadMap()

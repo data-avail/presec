@@ -33,9 +33,11 @@ namespace Presec.Service.Models
     }
 
     [Serializable]
-    [DataServiceKey("point")]
+    [DataServiceKey("term")]
     public class FoundBy
     {
+        public string term { get; set; } 
+
         public Line found { get; set; }
 
         public GeoPoint point { get; set; }
@@ -123,7 +125,7 @@ namespace Presec.Service.Models
 
         public string refer { get; set; }
 
-        public MatchedSubstring match { get; set; }
+        public MatchedSubstring [] matches { get; set; }
 
     }
 

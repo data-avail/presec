@@ -53,11 +53,9 @@ namespace Presec.Service.Repositories
                                 descr = p.Descendants("description").Single().Value,
                                 refer = p.Descendants("reference").Single().Value,
                                 term = p.Descendants("term").Descendants("value").First().Value,
-                                match = new MatchedSubstring
-                                {
-                                    offset = int.Parse(p.Descendants("matched_substring").First().Descendants("offset").Single().Value),
-                                    length = int.Parse(p.Descendants("matched_substring").First().Descendants("length").Single().Value)
-                                }
+                                matches = p.Descendants("matched_substring").Skip(2).Select(s => new MatchedSubstring { 
+                                    offset = int.Parse(s.Descendants("offset").Single().Value), 
+                                    length = int.Parse(s.Descendants("length").Single().Value)}).ToArray()
                             }).ToArray();
                     geoSug = new GeoSuggestion { term = term, suggestions = suggestions };
 

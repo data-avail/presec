@@ -211,7 +211,7 @@ namespace Presec.Service.Repositories
                 double lat = double.Parse(geo[0], CultureInfo.InvariantCulture);
                 double lng = double.Parse(geo[1], CultureInfo.InvariantCulture);
 
-                FoundBy = new FoundBy { found = new Line { addr = sug.descr, matches = new MatchedSubstring [] { sug.match }}, point = new GeoPoint { lat = lat, lon = lng } };
+                FoundBy = new FoundBy { term = Term, found = new Line { addr = sug.descr, matches = sug.matches }, point = new GeoPoint { lat = lat, lon = lng } };
 
                 return Collection.Find(Query.Near("station.geo", lat, lng)).Take(6).ToArray(); 
             }

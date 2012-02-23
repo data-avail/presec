@@ -120,7 +120,7 @@ namespace Presec.Test
         }
 
         [TestMethod()]
-        public void GetSuggestions_вин()
+        public void GetSuggestions_виноку()
         {
             GeoSuggestionRepository target = new GeoSuggestionRepository();
             var act = target.GetOne("россия, москва, виноку");

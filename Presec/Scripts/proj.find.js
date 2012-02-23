@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var LineModel, ViewModel, createMap, createSelector, fCollection, gCollection, loadMap, map, viewModel;
+    var LineModel, ViewModel, createMap, createSelector, fCollection, findStation, gCollection, loadMap, map, viewModel;
     map = null;
     gCollection = new YMaps.GeoObjectCollection();
     fCollection = new YMaps.GeoObjectCollection();
@@ -45,6 +45,23 @@
         return loadMap();
       });
     };
+    findStation = function(search) {
+      return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", function(data) {
+        var geo, placemark;
+        fCollection.removeAll();
+        ko.mapping.fromJS(data, {}, viewModel);
+        geo = viewModel.station().geo;
+        if (geo) {
+          map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
+        }
+        placemark = new YMaps.Placemark(map.getCenter(), {
+          draggable: false,
+          style: "default#attentionIcon"
+        });
+        placemark.id = placemark.name = placemark.description = viewModel.id();
+        return fCollection.add(placemark);
+      });
+    };
     createSelector = function() {
       $("#search_field").autocomplete({
         minLength: 3,
@@ -70,23 +87,7 @@
     };
     $(".toggle_layout").hide();
     $("#search_button").click(function() {
-      var search;
-      fCollection.removeAll();
-      search = $("#search_field").val();
-      return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", function(data) {
-        var geo, placemark;
-        ko.mapping.fromJS(data, {}, viewModel);
-        geo = viewModel.station().geo;
-        if (geo) {
-          map.setCenter(new YMaps.GeoPoint(geo.lat(), geo.lon()), 15);
-        }
-        placemark = new YMaps.Placemark(map.getCenter(), {
-          draggable: false,
-          style: "default#attentionIcon"
-        });
-        placemark.id = placemark.name = placemark.description = viewModel.id();
-        return fCollection.add(placemark);
-      });
+      return findStation($("#search_field").val());
     });
     LineModel = (function() {
       function LineModel(id, lines) {
@@ -106,22 +107,12 @@
         this.boundary = ko.observableArray();
         this.matchType = ko.observable();
         this.foundBy = ko.observable();
-        /*
-                    @results = ko.observableArray()
-                    @first = ko.computed => @results()[0]
-                    @similars = ko.computed =>
-                      for r in @results().filter((x) => x != @results()[0])
-                        new LineModel r.id(), r.lines().filter((x) => new RegExp(".*" + (@search()) + ".*", "i").test(x.addr())).map((x)=>x.addr())
-                    @near = ko.computed =>
-                      if @first()
-                        for n in @first().near()
-                            new LineModel n.id(), n.lines().map (x) => x.addr()
-                      else
-                        []
-                    */
         this.similarToggle = ko.observable(false);
         this.nearToggle = ko.observable(false);
       }
+      ViewModel.prototype.showStation = function(data) {
+        return findStation(data.id());
+      };
       return ViewModel;
     })();
     ko.bindingHandlers.toggle = {

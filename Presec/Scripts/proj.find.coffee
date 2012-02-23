@@ -29,6 +29,16 @@ $ ->
     map.addOverlay fCollection
     YMaps.Events.observe map, map.Events.BoundsChange, (object) -> loadMap()
 
+  findStation = (search) ->
+    OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", (data) ->
+      fCollection.removeAll()
+      ko.mapping.fromJS data, {}, viewModel
+      geo = viewModel.station().geo
+      if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
+      placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#attentionIcon"}
+      placemark.id = placemark.name = placemark.description = viewModel.id()
+      fCollection.add placemark
+
   createSelector = ->
       $("#search_field").autocomplete
         minLength : 3,
@@ -43,17 +53,10 @@ $ ->
           $("#search_button").click()
 
     $(".toggle_layout").hide()
-    #events
+
+
     $("#search_button").click ->
-        fCollection.removeAll()
-        search = $("#search_field").val()
-        OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", (data) ->
-          ko.mapping.fromJS data, {}, viewModel
-          geo = viewModel.station().geo
-          if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
-          placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "default#attentionIcon"}
-          placemark.id = placemark.name = placemark.description = viewModel.id()
-          fCollection.add placemark
+        findStation $("#search_field").val()
 
     class LineModel
       constructor:(@id, @lines) ->
@@ -69,21 +72,11 @@ $ ->
             @boundary = ko.observableArray()
             @matchType = ko.observable()
             @foundBy = ko.observable()
-            ###
-            @results = ko.observableArray()
-            @first = ko.computed => @results()[0]
-            @similars = ko.computed =>
-              for r in @results().filter((x) => x != @results()[0])
-                new LineModel r.id(), r.lines().filter((x) => new RegExp(".*" + (@search()) + ".*", "i").test(x.addr())).map((x)=>x.addr())
-            @near = ko.computed =>
-              if @first()
-                for n in @first().near()
-                    new LineModel n.id(), n.lines().map (x) => x.addr()
-              else
-                []
-            ###
             @similarToggle = ko.observable false
             @nearToggle = ko.observable false
+
+        showStation: (data) ->
+            findStation data.id()
 
     ko.bindingHandlers.toggle =
         init: (element, valueAccessor, allBindingsAccessor, viewModel) ->

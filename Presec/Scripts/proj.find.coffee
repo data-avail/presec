@@ -47,7 +47,7 @@ $ ->
     $("#search_button").click ->
         fCollection.removeAll()
         search = $("#search_field").val()
-        OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches", (data) ->
+        OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", (data) ->
           ko.mapping.fromJS data, {}, viewModel
           geo = viewModel.station().geo
           if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
@@ -67,6 +67,8 @@ $ ->
             @similar = ko.observableArray()
             @near = ko.observableArray()
             @boundary = ko.observableArray()
+            @matchType = ko.observable()
+            @foundBy = ko.observable()
             ###
             @results = ko.observableArray()
             @first = ko.computed => @results()[0]

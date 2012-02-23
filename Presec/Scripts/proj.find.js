@@ -73,7 +73,7 @@
       var search;
       fCollection.removeAll();
       search = $("#search_field").val();
-      return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches", function(data) {
+      return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", function(data) {
         var geo, placemark;
         ko.mapping.fromJS(data, {}, viewModel);
         geo = viewModel.station().geo;
@@ -104,6 +104,8 @@
         this.similar = ko.observableArray();
         this.near = ko.observableArray();
         this.boundary = ko.observableArray();
+        this.matchType = ko.observable();
+        this.foundBy = ko.observable();
         /*
                     @results = ko.observableArray()
                     @first = ko.computed => @results()[0]

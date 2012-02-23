@@ -64,6 +64,16 @@
                                 <i class="icon-search icon-white"></i>Поиск</a>
                             </form>
                         </li>
+                        <!-- ko if: matchType() == 'not_found' -->
+                        <li>
+                            <p>По вашему запросу соответствий не найдено.</p>
+                        </li>
+                        <!-- /ko -->
+                        <!-- ko if: matchType() == 'geo' -->
+                        <li>
+                            <p>По вашему запросу соответствий не найдено, показан ближайший к вам избирательный участок.</p>
+                        </li>
+                        <!-- /ko -->
                         <!-- ko if: id -->
                         <li>
                             <div class="row-fluent">

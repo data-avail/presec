@@ -244,23 +244,6 @@ namespace Presec.Test
         }
 
         [TestMethod()]
-        public void GetByGoogleRef_лисичанская()
-        {
-            /*
-            //ClRBAAAA8fiTTf0qlAtK1NnUblpdGtY5T_se4KtvLvxTJNjs2FnIIWK2TDgNdRcgEps1NCdPNTrHv3k1GOXlrnCvjVdGLBs_H_ToMeNfZ3MxZsqmIpgSEHm3jvB1DyRNfk0iVWaRgVkaFCmpKkegcbJuY17m_yrg9a5xzLuA
-            StationRepository target = new StationRepository();
-            ODataQueryOperation operation = new ODataQueryOperation();
-            operation.ContextParameters = new Dictionary<string, string>();
-            operation.ContextParameters.Add("addr", "россия, москва, лисичанская улица");
-            operation.ContextParameters.Add("gref", "ClRBAAAA8fiTTf0qlAtK1NnUblpdGtY5T_se4KtvLvxTJNjs2FnIIWK2TDgNdRcgEps1NCdPNTrHv3k1GOXlrnCvjVdGLBs_H_ToMeNfZ3MxZsqmIpgSEHm3jvB1DyRNfk0iVWaRgVkaFCmpKkegcbJuY17m_yrg9a5xzLuA");
-            IEnumerable<Station> actual;
-            actual = target.GetAll(operation);
-            Assert.AreEqual(5, actual.Count());
-             */
-
-        }
-
-        [TestMethod()]
         public void GetAllMoscowMapRegions()
         {
             MapRegionRepository target = new MapRegionRepository();
@@ -279,7 +262,7 @@ namespace Presec.Test
         }
 
         [TestMethod()]
-        public void FindOne_винокур()
+        public void FindOne_Station_винокур()
         {
             StationRepository target = new StationRepository();
             var actual = target.GetOne("винокур");
@@ -290,21 +273,9 @@ namespace Presec.Test
             Assert.AreEqual(5, actual.near.Count());
         }
 
-        [TestMethod()]
-        public void FindOne_strict_винокур()
-        {
-            StationRepository target = new StationRepository();
-            var actual = target.GetOne("винокур");
-            Assert.AreNotEqual(null, actual);
-            Assert.AreEqual(1, actual.similar.Count());
-            Assert.AreEqual(2173, actual.id);
-            Assert.AreEqual(2174, actual.similar[0].id);
-            Assert.AreEqual(5, actual.near.Count());
-
-        }
 
         [TestMethod()]
-        public void FindOne_Улица_Шверника()
+        public void FindOne_Station_Улица_Шверника()
         {
             StationRepository target = new StationRepository();
             var actual = target.GetOne("Улица Шверника");
@@ -312,12 +283,17 @@ namespace Presec.Test
             Assert.AreEqual(0, actual.similar.Count());
             Assert.AreEqual(2174, actual.id);
             //Assert.AreEqual(1362, actual.similar[0].id);
-            Assert.AreEqual(5, actual.near.Count());
-
-            
+            Assert.AreEqual(5, actual.near.Count());            
         }
 
-
+        [TestMethod()]
+        public void FindOne_Station_синод()
+        {
+            StationRepository target = new StationRepository();
+            var actual = target.GetOne("синод");
+            Assert.AreNotEqual(null, actual);
+            Assert.AreEqual("geo", actual.matchType);
+        }
 
     }
 }

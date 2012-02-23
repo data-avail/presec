@@ -205,7 +205,7 @@ namespace Presec.Service.Repositories
                 
                 XDocument xdoc = XDocument.Parse(str);
                 
-                var geoNode = xdoc.Root.Descendants().Single(p=>p.Name == XName.Get("pos", "http://www.opengis.net/gml"));
+                var geoNode = xdoc.Root.Descendants().First(p=>p.Name == XName.Get("pos", "http://www.opengis.net/gml"));
 
                 var geo = geoNode.Value.Split(' ');
                 double lat = double.Parse(geo[0], CultureInfo.InvariantCulture);

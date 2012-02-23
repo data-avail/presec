@@ -17,8 +17,8 @@ namespace Presec.Service.Repositories
 {
     public class StationRepository
     {
-        private static string[] routeNames = new[] { "улица", "площадь", "набережная", "проспект", "тупик", "шоссе", "проезд", "наб.", "ул.", "пр.", "ш.", "пл." };
-        private static string[] routeNamesWell = new[] { "улица", "площадь", "набережная", "проспект", "тупик", "шоссе", "проезд", "набережная", "улица", "проезд", "шоссе", "площадь" };
+        private static string[] routeNames = new[] { "улица", "площадь", "набережная", "проспект", "тупик", "шоссе", "проезд", "переулок", "пер.", "наб.", "ул.", "пр.", "ш.", "пл." };
+        private static string[] routeNamesWell = new[] { "улица", "площадь", "набережная", "проспект", "тупик", "шоссе", "проезд", "переулок", "переулок", "набережная", "улица", "проезд", "шоссе", "площадь" };
         private static string[] premiseNames = new[] { "дом", "строение", "корпус", "здание", "стр.", "к.", "д." };
         private static string[] premiseNamesWell = new[] { "дом", "строение", "корпус", "здание", "строение", "корпус", "дом" };
         private static string routeRegex = ".*({0}).*";

@@ -1,33 +1,57 @@
 $ ->
   map = null
   gCollection = new YMaps.GeoObjectCollection()
-  fCollection = new YMaps.GeoObjectCollection()
+  activePlacemark = null
 
   ini = ->
       gStyle = new YMaps.Style()
       gStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place agreg">$[iconContent]</div>'))
       gStyle.iconStyle.offset = new YMaps.Point -20, -40
       sStyle = new YMaps.Style()
-      sStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place station">$[iconContent]</div>'))
+      sStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place $[className]">$[iconContent]</div>'))
       sStyle.iconStyle.offset = new YMaps.Point -20, -40
-      hStyle = new YMaps.Style()
-      hStyle.iconStyle = new YMaps.IconStyle(new YMaps.Template('<div class="place home">$[iconContent]</div>'))
-      hStyle.iconStyle.offset = new YMaps.Point -20, -40
 
       YMaps.Styles.add "user#agreg", gStyle
       YMaps.Styles.add "user#station", sStyle
-      YMaps.Styles.add "user#home", hStyle
-    
-      YMaps.Placemark.prototype.setCustomIconContent = (content) ->
+
+      YMaps.Placemark.prototype.setCustomIconContent = (content, className) ->
         @iconContent = content
+        @className = className
         @update()
 
-  iniStationPlacemark = (placemark, id) ->
-    placemark.id = id
-    placemark.name = "Участок: " + id
-    placemark.setCustomIconContent id
-    YMaps.Events.observe placemark, placemark.Events.Click, (prk) ->
-      findStation prk.id
+  subscribePlacemarkClick = (placemark) ->
+    YMaps.Events.observe placemark, placemark.Events.Click, (placemark) ->
+      findStation placemark.id, false
+
+  iniPlacemark = (placemark, className) ->
+    if placemark.grpCount > 1
+      placemark.name = "Участок: #{placemark.id}..."
+      placemark.setCustomIconContent "#{placemark.id}+", className
+    else
+      placemark.name = "Участок: #{placemark.id}"
+      placemark.setCustomIconContent placemark.id, className
+
+  showPlacemarks = (placemarks) ->
+    for grp in _.toArray _.groupBy(placemarks, (prk) -> prk._point.toString())
+      descr = (grp.map (x) -> x.id).toString()
+      prk = _.sortBy(grp, (x) -> x.id)[0]
+      prk.grpCount = grp.length
+      iniPlacemark prk, "station"
+      prk.description = descr
+      subscribePlacemarkClick prk
+      gCollection.add prk
+      resetActivePlacemark activePlacemark
+
+  resetActivePlacemark = (newActivePlacemark) ->
+    if activePlacemark
+      prk = gCollection._objects.filter((x) -> x.id == activePlacemark.id)[0]
+      if prk then iniPlacemark prk, "station"
+    if newActivePlacemark
+        prk = gCollection._objects.filter((x) -> x._point.equals newActivePlacemark._point)[0]
+        if prk
+          prk.id = newActivePlacemark.id
+          iniPlacemark prk, "home"
+    activePlacemark = newActivePlacemark
 
   loadMap = ->
     bounds = map.getBounds()
@@ -37,39 +61,45 @@ $ ->
     else if map.getZoom() <= 13
       zoom = "district"
     id = "#{bounds._left};#{bounds._bottom};#{bounds._right};#{bounds._top};#{zoom}"
-    gCollection.removeAll()
     OData.read "/Service/PresecService.svc/MapRegions('#{id}')?$expand=coords", (result) ->
-        $(result.coords).each ->
-          id = @descr if @type == 2
-          if fCollection.filter((x) -> x.id.toString() == id).length == 0
-            style = if @type != 2 then "user#agreg" else "user#station"
-            placemark = new YMaps.Placemark new YMaps.GeoPoint(@lat, @lon), {draggable: false, hideIcon: false, style : style}
-            if @type != 2
-                placemark.name = @descr
-                placemark.description = "Всего участков: " + @count
-                placemark.setCustomIconContent @count
-            else
-                iniStationPlacemark placemark, id
+      prks = []
+      gCollection.removeAll()
+      $(result.coords).each ->
+        id = @descr if @type == 2
+        style = if @type != 2 then "user#agreg" else "user#station"
+        placemark = new YMaps.Placemark new YMaps.GeoPoint(@lat, @lon), {draggable: false, hideIcon: false, style : style}
+        if @type != 2
+            placemark.name = @descr
+            placemark.description = "Всего участков: " + @count
+            placemark.setCustomIconContent @count
             gCollection.add placemark
+        else
+            placemark.id = id
+            prks.push placemark
+      if prks.length then showPlacemarks prks
+
 
   createMap = ->
     map = new YMaps.Map $("#map")[0]
     map.setCenter new YMaps.GeoPoint(37.64, 55.76), 10
     map.enableScrollZoom()
     map.addOverlay gCollection
-    map.addOverlay fCollection
     YMaps.Events.observe map, map.Events.BoundsChange, (object) -> loadMap()
 
-  findStation = (search) ->
+  findStation = (search, setCenter) ->
+    if activePlacemark and activePlacemark.id == search then return
     OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", (data) ->
-      fCollection.removeAll()
       ko.mapping.fromJS data, {}, viewModel
       geo = viewModel.station().geo
-      if geo then map.setCenter new YMaps.GeoPoint(geo.lat(), geo.lon()), 15
-      placemark = new YMaps.Placemark map.getCenter(), {draggable: false, style : "user#home"}
-      iniStationPlacemark placemark, viewModel.id()
-      fCollection.add placemark
-     
+      activePrk = null
+      if geo
+        pt = new YMaps.GeoPoint geo.lat(), geo.lon()
+        activePrk = new YMaps.Placemark pt, {draggable: false, hideIcon: false, style : "user#station"}
+        activePrk.id = viewModel.id()
+      if setCenter and pt and !pt.equals map.getCenter()
+        map.setCenter pt, 15
+      resetActivePlacemark activePrk
+
   createSelector = ->
       $("#search_field").autocomplete
         minLength : 3,
@@ -86,7 +116,7 @@ $ ->
     $(".toggle_layout").hide()
 
     $("#search_button").click ->
-        findStation $("#search_field").val()
+        findStation $("#search_field").val(), true
 
     class LineModel
       constructor:(@id, @lines) ->
@@ -106,7 +136,7 @@ $ ->
             @nearToggle = ko.observable false
 
         showStation: (data) ->
-            findStation data.id()
+            findStation data.id(), true
 
     ko.bindingHandlers.toggle =
         init: (element, valueAccessor, allBindingsAccessor, viewModel) ->

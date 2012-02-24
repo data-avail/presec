@@ -24,3 +24,9 @@
 {
     background-image: url('/Content/images/home.png');
 }
+
+.hidden
+{
+     visibility: hidden;
+}
+

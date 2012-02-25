@@ -122,7 +122,7 @@
                     <tr><td data-bind="text : addr"></td></tr>
                 </script>
                 <script type="text/html" id="addr-ref-template">
-                    <tr data-bind="click: $root.showStation">
+                    <tr class="pointer" data-bind="click: $root.showStation">
                         <td>
                             <span data-bind="text: id" class="label label-success"></span>
                         </td>
@@ -134,7 +134,7 @@
                     </tr>
                 </script>
                 <script type="text/html" id="addr-list-template">
-                    <tr data-bind="click: $root.showStation">
+                    <tr class="pointer" data-bind="click: $root.showStation">
                         <td>
                             <span data-bind="text: id" class="label label-success"></span>
                         </td>
@@ -143,7 +143,7 @@
                     </tr>
                 </script>
                 <script type="text/html" id="twins-template">
-                    &nbsp;<span data-bind="click: $root.showStation, text: id" class="label"></span>
+                    &nbsp;<span data-bind="click: $root.showStation, text: id" class="label pointer"></span>
                 </script>
             </div>
             <!--/span-->

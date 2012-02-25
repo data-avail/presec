@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var LineModel, ViewModel, activePlacemark, createMap, createSelector, findStation, gCollection, ini, iniPlacemark, loadMap, map, resetActivePlacemark, showPlacemarks, startLoading, stopLoading, subscribePlacemarkClick, viewModel;
+    var LineModel, ViewModel, activePlacemark, createMap, createSelector, findStation, gCollection, ini, iniPlacemark, loadMap, map, resetActivePlacemark, setStartPoint, showPlacemarks, startLoading, stopLoading, subscribePlacemarkClick, viewModel;
     map = null;
     gCollection = new YMaps.GeoObjectCollection();
     activePlacemark = null;
@@ -84,8 +84,20 @@
       }
       return activePlacemark = newActivePlacemark;
     };
-    loadMap = function() {
+    setStartPoint = function() {
+      if (navigator.geolocation) {
+        return navigator.geolocation.getCurrentPosition(function(geo) {
+          return loadMap(geo.coords);
+        }, function(error) {
+          return loadMap(YMaps.location ? YMaps.location : null);
+        });
+      }
+    };
+    loadMap = function(point) {
       var bounds, id, zoom;
+      if (point) {
+        map.setCenter(new YMaps.GeoPoint(point.longitude, point.latitude), 17);
+      }
       bounds = map.getBounds();
       zoom = "street";
       if (map.getZoom() <= 10) {
@@ -231,6 +243,6 @@
     ini();
     createMap();
     createSelector();
-    return loadMap();
+    return setStartPoint();
   });
 }).call(this);

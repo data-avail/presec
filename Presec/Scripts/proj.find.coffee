@@ -59,7 +59,16 @@ $ ->
           iniPlacemark prk, "home"
     activePlacemark = newActivePlacemark
 
-  loadMap = ->
+  setStartPoint = ->
+    if navigator.geolocation
+       navigator.geolocation.getCurrentPosition (geo) ->
+            loadMap geo.coords
+        , (error) ->
+            loadMap if YMaps.location then YMaps.location else null
+
+  loadMap = (point) ->
+    if point
+        map.setCenter new YMaps.GeoPoint(point.longitude, point.latitude), 17
     bounds = map.getBounds()
     zoom = "street"
     if map.getZoom() <= 10
@@ -163,4 +172,4 @@ $ ->
     ini()
     createMap()
     createSelector()
-    loadMap()
+    setStartPoint()

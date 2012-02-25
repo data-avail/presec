@@ -146,7 +146,7 @@
       });
     };
     findStation = function(search, setCenter) {
-      if (activePlacemark && activePlacemark.id === search) {
+      if (!search || (activePlacemark && activePlacemark.id === search)) {
         return;
       }
       startLoading();

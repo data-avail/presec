@@ -102,7 +102,7 @@ $ ->
     YMaps.Events.observe map, map.Events.BoundsChange, (object) -> loadMap()
 
   findStation = (search, setCenter) ->
-    if activePlacemark and activePlacemark.id == search then return
+    if !search or (activePlacemark and activePlacemark.id == search) then return
     startLoading()
     OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point,twins", (data) ->
       ko.mapping.fromJS data, {}, viewModel

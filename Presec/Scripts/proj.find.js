@@ -1,5 +1,4 @@
 (function() {
-
   $(function() {
     var LineModel, ViewModel, activePlacemark, createMap, createSelector, findStation, gCollection, ini, iniPlacemark, loadMap, map, resetActivePlacemark, showPlacemarks, subscribePlacemarkClick, viewModel;
     map = null;
@@ -64,7 +63,9 @@
         prk = gCollection._objects.filter(function(x) {
           return x.id === activePlacemark.id;
         })[0];
-        if (prk) iniPlacemark(prk, "station");
+        if (prk) {
+          iniPlacemark(prk, "station");
+        }
       }
       if (newActivePlacemark) {
         prk = gCollection._objects.filter(function(x) {
@@ -93,7 +94,9 @@
         gCollection.removeAll();
         $(result.coords).each(function() {
           var placemark, style;
-          if (this.type === 2) id = this.descr;
+          if (this.type === 2) {
+            id = this.descr;
+          }
           style = this.type !== 2 ? "user#agreg" : "user#station";
           placemark = new YMaps.Placemark(new YMaps.GeoPoint(this.lat, this.lon), {
             draggable: false,
@@ -110,7 +113,9 @@
             return prks.push(placemark);
           }
         });
-        if (prks.length) return showPlacemarks(prks);
+        if (prks.length) {
+          return showPlacemarks(prks);
+        }
       });
     };
     createMap = function() {
@@ -123,8 +128,10 @@
       });
     };
     findStation = function(search, setCenter) {
-      if (activePlacemark && activePlacemark.id === search) return;
-      return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", function(data) {
+      if (activePlacemark && activePlacemark.id === search) {
+        return;
+      }
+      return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point,twins", function(data) {
         var activePrk, geo, pt;
         ko.mapping.fromJS(data, {}, viewModel);
         geo = viewModel.station().geo;
@@ -138,7 +145,9 @@
           });
           activePrk.id = viewModel.id();
         }
-        if (setCenter && pt && !pt.equals(map.getCenter())) map.setCenter(pt, 15);
+        if (setCenter && pt && !pt.equals(map.getCenter())) {
+          map.setCenter(pt, 15);
+        }
         return resetActivePlacemark(activePrk);
       });
     };
@@ -170,23 +179,20 @@
       return findStation($("#search_field").val(), true);
     });
     LineModel = (function() {
-
       function LineModel(id, lines) {
         this.id = id;
         this.lines = lines;
       }
-
       return LineModel;
-
     })();
     ViewModel = (function() {
-
       function ViewModel() {
         this.id = ko.observable();
         this.key = ko.observable();
         this.station = ko.observable();
         this.uik = ko.observable();
         this.similar = ko.observableArray();
+        this.twins = ko.observableArray();
         this.near = ko.observableArray();
         this.boundary = ko.observableArray();
         this.matchType = ko.observable();
@@ -194,13 +200,10 @@
         this.similarToggle = ko.observable(false);
         this.nearToggle = ko.observable(false);
       }
-
       ViewModel.prototype.showStation = function(data) {
         return findStation(data.id(), true);
       };
-
       return ViewModel;
-
     })();
     ko.bindingHandlers.toggle = {
       init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -220,5 +223,4 @@
     createSelector();
     return loadMap();
   });
-
 }).call(this);

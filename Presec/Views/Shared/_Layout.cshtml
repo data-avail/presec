@@ -95,7 +95,7 @@
                             </table>
                         </li>
                         <li class="nav-header">Ваш избирательный участок &nbsp;&nbsp;<span data-bind="text: id"
-                            class="label label-success"></span></li>
+                            class="label label-success"></span><span data-bind="template: {name: 'twins-template', foreach: twins}"></span></li>
                         <li data-bind="template: {name: 'addr-template', data: station}"></li>
                         <li class="nav-header">Ваш УИК</li>
                         <li data-bind="template: {name: 'addr-template', data: uik}"></li>
@@ -142,6 +142,9 @@
                         </td>
                     </tr>
                 </script>
+                <script type="text/html" id="twins-template">
+                    &nbsp;<span data-bind="click: $root.showStation, text: id" class="label"></span>
+                </script>
             </div>
             <!--/span-->
             <div class="span8">
@@ -155,7 +158,7 @@
         <hr>
         <footer>
             <p>
-                © Company 2012</p>
+                © Data-Avail 2012</p>
         </footer>
     </div>
     <!--/.fluid-container-->

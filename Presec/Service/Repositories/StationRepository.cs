@@ -88,7 +88,9 @@ namespace Presec.Service.Repositories
                 {
                     var similar = found.Where(p => p._id != res._id);
 
-                    var near = collection.Find(Query.Near("station.geo", res.station.geo[0], res.station.geo[1])).Take(6).ToArray().Where(p => p._id != res._id);
+                    var twins = collection.Find(Query.Near("station.geo", res.station.geo[0], res.station.geo[1], 0.0)).Take(6).ToArray().Where(p => p._id != res._id);
+                    var twinIds = twins.Select(p => p._id).ToArray();
+                    var near = collection.Find(Query.And(Query.NotIn("_id", BsonArray.Create(twinIds)),  Query.Near("station.geo", res.station.geo[0], res.station.geo[1]))).Take(6).ToArray().Where(p => p._id != res._id);
 
                     var st = new Station
                     {
@@ -118,7 +120,9 @@ namespace Presec.Service.Repositories
                         geo = res.uik.geo != null ? new GeoPoint { lat = res.uik.geo[0], lon = res.uik.geo[1] } : null
                     };
 
+                    st.twins = twins.Select(p => new Ref { id = p._id }).ToArray();
                     st.near = near.Select(p => new Ref { id = p._id, descr = p.station.addr }).ToArray();
+
                     if (matchType == "similar" && foundPattern != null)
                     {
                         st.similar = 

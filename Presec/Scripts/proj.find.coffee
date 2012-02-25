@@ -88,7 +88,7 @@ $ ->
 
   findStation = (search, setCenter) ->
     if activePlacemark and activePlacemark.id == search then return
-    OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point", (data) ->
+    OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point,twins", (data) ->
       ko.mapping.fromJS data, {}, viewModel
       geo = viewModel.station().geo
       activePrk = null
@@ -128,6 +128,7 @@ $ ->
             @station = ko.observable()
             @uik = ko.observable()
             @similar = ko.observableArray()
+            @twins = ko.observableArray()
             @near = ko.observableArray()
             @boundary = ko.observableArray()
             @matchType = ko.observable()

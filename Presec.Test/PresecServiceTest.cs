@@ -262,14 +262,16 @@ namespace Presec.Test
         }
 
         [TestMethod()]
-        public void FindOne_Station_винокур()
+        public void FindOne_Station_винок()
         {
             StationRepository target = new StationRepository();
-            var actual = target.GetOne("винокур");
+            var actual = target.GetOne("винок");
             Assert.AreNotEqual(null, actual);
             Assert.AreEqual(1, actual.similar.Count());
             Assert.AreEqual(2173, actual.id);
             Assert.AreEqual(2174, actual.similar[0].id);
+            Assert.AreEqual(1, actual.twins.Count());
+            Assert.AreEqual(2174, actual.twins[0].id);
             Assert.AreEqual(5, actual.near.Count());
         }
 

@@ -30,7 +30,10 @@ namespace Presec.Service.Models
 
         //used only if matchType == geo
         public FoundBy foundBy { get; set; }
+
+        public Ref[] twins { get; set; }
     }
+
 
     [Serializable]
     [DataServiceKey("term")]

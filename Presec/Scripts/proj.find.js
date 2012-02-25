@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var LineModel, ViewModel, activePlacemark, createMap, createSelector, findStation, gCollection, ini, iniPlacemark, loadMap, map, resetActivePlacemark, showPlacemarks, subscribePlacemarkClick, viewModel;
+    var LineModel, ViewModel, activePlacemark, createMap, createSelector, findStation, gCollection, ini, iniPlacemark, loadMap, map, resetActivePlacemark, showPlacemarks, startLoading, stopLoading, subscribePlacemarkClick, viewModel;
     map = null;
     gCollection = new YMaps.GeoObjectCollection();
     activePlacemark = null;
@@ -19,6 +19,12 @@
         this.className = className;
         return this.update();
       };
+    };
+    startLoading = function() {
+      return $("#loading").fadeIn("slow");
+    };
+    stopLoading = function() {
+      return $("#loading").fadeOut("slow");
     };
     subscribePlacemarkClick = function(placemark) {
       return YMaps.Events.observe(placemark, placemark.Events.Click, function(placemark) {
@@ -131,6 +137,7 @@
       if (activePlacemark && activePlacemark.id === search) {
         return;
       }
+      startLoading();
       return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point,twins", function(data) {
         var activePrk, geo, pt;
         ko.mapping.fromJS(data, {}, viewModel);
@@ -148,7 +155,8 @@
         if (setCenter && pt && !pt.equals(map.getCenter())) {
           map.setCenter(pt, 15);
         }
-        return resetActivePlacemark(activePrk);
+        resetActivePlacemark(activePrk);
+        return stopLoading();
       });
     };
     createSelector = function() {

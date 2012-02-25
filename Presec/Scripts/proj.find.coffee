@@ -19,6 +19,12 @@ $ ->
         @className = className
         @update()
 
+  startLoading = ->
+      $("#loading").fadeIn "slow"
+
+  stopLoading = ->
+      $("#loading").fadeOut "slow"
+
   subscribePlacemarkClick = (placemark) ->
     YMaps.Events.observe placemark, placemark.Events.Click, (placemark) ->
       findStation placemark.id, false
@@ -88,6 +94,7 @@ $ ->
 
   findStation = (search, setCenter) ->
     if activePlacemark and activePlacemark.id == search then return
+    startLoading()
     OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point,twins", (data) ->
       ko.mapping.fromJS data, {}, viewModel
       geo = viewModel.station().geo
@@ -99,6 +106,7 @@ $ ->
       if setCenter and pt and !pt.equals map.getCenter()
         map.setCenter pt, 15
       resetActivePlacemark activePrk
+      stopLoading()
 
   createSelector = ->
       $("#search_field").autocomplete

@@ -111,6 +111,7 @@
     <Content Include="bootstrap\img\glyphicons-halflings.png" />
     <Content Include="bootstrap\js\bootstrap.js" />
     <Content Include="bootstrap\js\bootstrap.min.js" />
+    <Content Include="Content\badges\data-avail.png" />
     <Content Include="Content\base.css" />
     <Content Include="Content\badges\powered-by-google-on-white.png" />
     <Content Include="Content\images\agreg-middle.png" />

@@ -97,14 +97,15 @@ $ ->
     startLoading()
     OData.read "/Service/PresecService.svc/Stations('#{search}')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point,twins", (data) ->
       ko.mapping.fromJS data, {}, viewModel
-      geo = viewModel.station().geo
       activePrk = null
-      if geo
-        pt = new YMaps.GeoPoint geo.lat(), geo.lon()
-        activePrk = new YMaps.Placemark pt, {draggable: false, hideIcon: false, style : "user#station"}
-        activePrk.id = viewModel.id()
-      if setCenter and pt and !pt.equals map.getCenter()
-        map.setCenter pt, 15
+      if viewModel.matchType() != "not_found"
+          geo = viewModel.station().geo
+          if geo
+            pt = new YMaps.GeoPoint geo.lat(), geo.lon()
+            activePrk = new YMaps.Placemark pt, {draggable: false, hideIcon: false, style : "user#station"}
+            activePrk.id = viewModel.id()
+          if setCenter and pt and !pt.equals map.getCenter()
+            map.setCenter pt, 15
       resetActivePlacemark activePrk
       stopLoading()
 

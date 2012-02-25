@@ -221,7 +221,6 @@
     <Content Include="Scripts\modernizr-1.7.min.js" />
     <Content Include="Scripts\proj.find.js" />
     <Content Include="Scripts\require.js" />
-    <Content Include="Scripts\spin.min.js" />
     <Content Include="Scripts\underscore-min.js" />
     <Content Include="Service\PresecService.svc" />
     <Content Include="Web.config" />

@@ -41,8 +41,12 @@
                 </a><a class="brand" href="#">izbirkom.org</a>
                 <div class="nav-collapse">
                     <ul class="nav">
-                        <li class="active"><a href="/Home/Index">Избирательные участки</a></li>
-                        <li><a href="/Home/About">О проекте</a></li>
+                        @{
+                            var active = "home";
+                            if (Request.RawUrl == "/Home/About") { active = "about"; }
+                         }
+                        <li @if (active == "home") { <text>class = "active"</text>  }><a href="/Home/Index">Избирательные участки</a></li>
+                        <li @if (active == "about") { <text>class = "active"</text>  }><a href="/Home/About">О проекте</a></li>
                         <!--<li><a href="#contact">Contact</a></li>-->
                     </ul>
                     <!--

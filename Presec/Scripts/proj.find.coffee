@@ -68,7 +68,7 @@ $ ->
 
   loadMap = (point) ->
     if point
-        map.setCenter new YMaps.GeoPoint(point.longitude, point.latitude), 17
+        map.setCenter new YMaps.GeoPoint(point.longitude, point.latitude), 14
     bounds = map.getBounds()
     zoom = "street"
     if map.getZoom() <= 10

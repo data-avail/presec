@@ -96,7 +96,7 @@
     loadMap = function(point) {
       var bounds, id, zoom;
       if (point) {
-        map.setCenter(new YMaps.GeoPoint(point.longitude, point.latitude), 17);
+        map.setCenter(new YMaps.GeoPoint(point.longitude, point.latitude), 14);
       }
       bounds = map.getBounds();
       zoom = "street";

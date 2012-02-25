@@ -271,7 +271,7 @@ namespace Presec.Test
             Assert.AreEqual(2173, actual.id);
             Assert.AreEqual(2174, actual.similar[0].id);
             Assert.AreEqual(1, actual.twins.Count());
-            Assert.AreEqual(2174, actual.twins[0].id);
+            Assert.AreEqual(2172, actual.twins[0].id);
             Assert.AreEqual(5, actual.near.Count());
         }
 

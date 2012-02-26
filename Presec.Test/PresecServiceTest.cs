@@ -250,10 +250,10 @@ namespace Presec.Test
             MapRegion actual = null;
             
             actual = target.GetOne("37.398300804197795;55.51375574905723;38.08494631201029;55.90144684501253;street");
-            Assert.AreEqual(1999, actual.coords.Count());
+            Assert.AreEqual(2995, actual.coords.Count());
 
             actual = target.GetOne("37.398300804197795;55.51375574905723;38.08494631201029;55.90144684501253;district");
-            Assert.AreEqual(113, actual.coords.Count());
+            Assert.AreEqual(120, actual.coords.Count());
             
 
             actual = target.GetOne("37.398300804197795;55.51375574905723;38.08494631201029;55.90144684501253;city");
@@ -267,9 +267,9 @@ namespace Presec.Test
             StationRepository target = new StationRepository();
             var actual = target.GetOne("винок");
             Assert.AreNotEqual(null, actual);
-            Assert.AreEqual(1, actual.similar.Count());
+            Assert.AreEqual(4, actual.similar.Count());
             Assert.AreEqual(2173, actual.id);
-            Assert.AreEqual(2174, actual.similar[0].id);
+            Assert.AreEqual(2057, actual.similar[0].id);
             Assert.AreEqual(1, actual.twins.Count());
             Assert.AreEqual(2172, actual.twins[0].id);
             Assert.AreEqual(5, actual.near.Count());
@@ -283,7 +283,7 @@ namespace Presec.Test
             var actual = target.GetOne("Улица Шверника");
             Assert.AreNotEqual(null, actual);
             Assert.AreEqual(0, actual.similar.Count());
-            Assert.AreEqual(2174, actual.id);
+            Assert.AreEqual(2052, actual.id);
             //Assert.AreEqual(1362, actual.similar[0].id);
             Assert.AreEqual(5, actual.near.Count());            
         }

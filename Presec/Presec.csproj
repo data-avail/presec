@@ -111,9 +111,15 @@
     <Content Include="bootstrap\img\glyphicons-halflings.png" />
     <Content Include="bootstrap\js\bootstrap.js" />
     <Content Include="bootstrap\js\bootstrap.min.js" />
+    <Content Include="Content\badges\apphbr.png" />
+    <Content Include="Content\badges\asp_dotnet_mvc.png" />
+    <Content Include="Content\badges\badge.png" />
     <Content Include="Content\badges\data-avail.png" />
+    <Content Include="Content\badges\love.png" />
+    <Content Include="Content\badges\mongo.png" />
+    <Content Include="Content\badges\yandex.png" />
     <Content Include="Content\base.css" />
-    <Content Include="Content\badges\powered-by-google-on-white.png" />
+    <Content Include="Content\badges\google.png" />
     <Content Include="Content\images\agreg-middle.png" />
     <Content Include="Content\images\home.png" />
     <Content Include="Content\images\spinner.gif" />

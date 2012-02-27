@@ -2,6 +2,9 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="description" content="Избирательные участки и УИК горда Москвы" />
+    <meta name="keywords" content="Избирательный участок, УИК, карта, Москва, выборы, избирательные участки" />
+    <meta name='yandex-verification' content='5962319f59377078' />
     <title>@ViewBag.Title</title>
     <link href="@Url.Content("~/bootstrap/css/bootstrap.css")" rel="stylesheet" type="text/css" />
     <style type="text/css">
@@ -14,8 +17,7 @@
         {
             padding: 9px 0;
         }
-    </style>
-    
+    </style>    
     <link href="@Url.Content("~/bootstrap/css/bootstrap-responsive.min.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/jquery-ui-1.8.17.custom.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/base.css")" rel="stylesheet" type="text/css" />
@@ -30,7 +32,18 @@
     <script src="@Url.Content("~/Scripts/proj.find.js")" type="text/javascript"></script>
     @{string yMapKey = System.Configuration.ConfigurationManager.AppSettings["YMapAPIKey"];}
     <script src="http://api-maps.yandex.ru/1.1/index.xml?key=@yMapKey" type="text/javascript"></script>
-    
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-29526318-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
 </head>
 <body>
     <div class="navbar navbar-fixed-top">

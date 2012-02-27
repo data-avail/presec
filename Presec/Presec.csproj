@@ -90,9 +90,6 @@
     <Compile Include="Service\Cahching\Cache.cs" />
     <Compile Include="Service\Cahching\ICache.cs" />
     <Compile Include="Service\MongoModels.cs" />
-    <Compile Include="Norm\Geo\LatLng.cs" />
-    <Compile Include="Norm\Geo\GeoQ.cs" />
-    <Compile Include="Norm\Geo\Qualifyers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\PresecService.svc.cs">
       <DependentUpon>PresecService.svc</DependentUpon>
@@ -138,77 +135,8 @@
     <Content Include="Content\images\ui-icons_ff0084_256x240.png" />
     <Content Include="Content\images\ui-icons_ffffff_256x240.png" />
     <Content Include="Content\jquery-ui-1.8.17.custom.css" />
-    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
-    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
-    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
-    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
-    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
-    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
-    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
-    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="Content\themes\base\jquery-ui.css" />
-    <Content Include="Content\themes\base\jquery.ui.accordion.css" />
-    <Content Include="Content\themes\base\jquery.ui.all.css" />
-    <Content Include="Content\themes\base\jquery.ui.autocomplete.css" />
-    <Content Include="Content\themes\base\jquery.ui.base.css" />
-    <Content Include="Content\themes\base\jquery.ui.button.css" />
-    <Content Include="Content\themes\base\jquery.ui.core.css" />
-    <Content Include="Content\themes\base\jquery.ui.datepicker.css" />
-    <Content Include="Content\themes\base\jquery.ui.dialog.css" />
-    <Content Include="Content\themes\base\jquery.ui.progressbar.css" />
-    <Content Include="Content\themes\base\jquery.ui.resizable.css" />
-    <Content Include="Content\themes\base\jquery.ui.selectable.css" />
-    <Content Include="Content\themes\base\jquery.ui.slider.css" />
-    <Content Include="Content\themes\base\jquery.ui.tabs.css" />
-    <Content Include="Content\themes\base\jquery.ui.theme.css" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_flat_0_aaaaaa_40x100.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_flat_75_ffffff_40x100.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_55_fbf9ee_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_65_ffffff_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_dadada_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_75_e6e6e6_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_glass_95_fef1ec_1x400.png" />
-    <Content Include="Content\themes\base\minified\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_222222_256x240.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_2e83ff_256x240.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_454545_256x240.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_888888_256x240.png" />
-    <Content Include="Content\themes\base\minified\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="Content\themes\base\minified\jquery-ui.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.accordion.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.all.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.autocomplete.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.base.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.button.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.core.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.datepicker.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.dialog.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.progressbar.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.resizable.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.selectable.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.slider.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
-    <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Global.asax" />
     <Content Include="README.jQuery.vsdoc.txt" />
-    <Content Include="Scripts\App\Bindings\ymap.bindings.js" />
-    <Content Include="Scripts\App\Controllers\controller.js" />
-    <Content Include="Scripts\App\Controllers\findController.js" />
-    <Content Include="Scripts\App\Handlebars.js" />
-    <Content Include="Scripts\App\hbs.js" />
-    <Content Include="Scripts\App\json2.js" />
-    <Content Include="Scripts\App\main.js" />
-    <Content Include="Scripts\App\Models\addr.js" />
-    <Content Include="Scripts\App\Models\find.js" />
-    <Content Include="Scripts\App\Models\mapView.js" />
-    <Content Include="Scripts\App\router.js" />
-    <Content Include="Scripts\App\text.js" />
-    <Content Include="Scripts\App\underscore.js" />
     <Content Include="Scripts\datajs-1.0.2.js" />
     <Content Include="Scripts\datajs-1.0.2.min.js" />
     <Content Include="Scripts\jquery-1.7.1-vsdoc.js" />
@@ -225,10 +153,7 @@
     <Content Include="Scripts\knockout.mapping.js" />
     <Content Include="Scripts\knockout.validation.js" />
     <Content Include="Scripts\knockout.validation.min.js" />
-    <Content Include="Scripts\modernizr-1.7.js" />
-    <Content Include="Scripts\modernizr-1.7.min.js" />
     <Content Include="Scripts\proj.find.js" />
-    <Content Include="Scripts\require.js" />
     <Content Include="Scripts\underscore-min.js" />
     <Content Include="Service\PresecService.svc" />
     <Content Include="Web.config" />
@@ -238,17 +163,10 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Content\Site.css" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\MicrosoftAjax.js" />
-    <Content Include="Scripts\MicrosoftAjax.debug.js" />
-    <Content Include="Scripts\MicrosoftMvcAjax.js" />
-    <Content Include="Scripts\MicrosoftMvcAjax.debug.js" />
-    <Content Include="Scripts\MicrosoftMvcValidation.js" />
-    <Content Include="Scripts\MicrosoftMvcValidation.debug.js" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
     <Content Include="Views\Account\ChangePasswordSuccess.cshtml" />
@@ -271,42 +189,6 @@
     <Content Include="Views\Shared\_Body.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Norm\Geo\README.md" />
-    <None Include="Scripts\App\Bindings\ymap.bindings.coffee">
-      <Generator>CoffeeScriptGenerator</Generator>
-      <LastGenOutput>ymap.bindings1.js</LastGenOutput>
-    </None>
-    <None Include="Scripts\App\Controllers\controller.coffee">
-      <Generator>CoffeeScriptGenerator</Generator>
-      <LastGenOutput>controller1.js</LastGenOutput>
-    </None>
-    <None Include="Scripts\App\Controllers\findController.coffee">
-      <Generator>CoffeeScriptGenerator</Generator>
-      <LastGenOutput>findController1.js</LastGenOutput>
-    </None>
-    <None Include="Scripts\App\main.coffee">
-      <Generator>CoffeeScriptGenerator</Generator>
-      <LastGenOutput>main1.js</LastGenOutput>
-    </None>
-    <None Include="Scripts\App\Models\addr.coffee">
-      <Generator>CoffeeScriptGenerator</Generator>
-      <LastGenOutput>addr1.js</LastGenOutput>
-    </None>
-    <None Include="Scripts\App\Models\find.coffee">
-      <Generator>CoffeeScriptGenerator</Generator>
-      <LastGenOutput>find1.js</LastGenOutput>
-    </None>
-    <None Include="Scripts\App\Models\mapView.coffee">
-      <Generator>CoffeeScriptGenerator</Generator>
-      <LastGenOutput>mapView1.js</LastGenOutput>
-    </None>
-    <None Include="Scripts\App\README.md" />
-    <None Include="Scripts\App\router.coffee">
-      <Generator>CoffeeScriptGenerator</Generator>
-      <LastGenOutput>router1.js</LastGenOutput>
-    </None>
-    <None Include="Scripts\App\Views\Find\index.hbs" />
-    <None Include="Scripts\App\Views\Find\_tool.hbs" />
     <None Include="Scripts\proj.find.coffee" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

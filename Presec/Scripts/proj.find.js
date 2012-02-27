@@ -1,4 +1,5 @@
 (function() {
+
   $(function() {
     var LineModel, ViewModel, activePlacemark, createMap, createSelector, findStation, gCollection, ini, iniPlacemark, loadMap, map, resetActivePlacemark, setStartPoint, showPlacemarks, startLoading, stopLoading, subscribePlacemarkClick, viewModel;
     map = null;
@@ -69,9 +70,7 @@
         prk = gCollection._objects.filter(function(x) {
           return x.id === activePlacemark.id;
         })[0];
-        if (prk) {
-          iniPlacemark(prk, "station");
-        }
+        if (prk) iniPlacemark(prk, "station");
       }
       if (newActivePlacemark) {
         prk = gCollection._objects.filter(function(x) {
@@ -112,9 +111,7 @@
         gCollection.removeAll();
         $(result.coords).each(function() {
           var placemark, style;
-          if (this.type === 2) {
-            id = this.descr;
-          }
+          if (this.type === 2) id = this.descr;
           style = this.type !== 2 ? "user#agreg" : "user#station";
           placemark = new YMaps.Placemark(new YMaps.GeoPoint(this.lat, this.lon), {
             draggable: false,
@@ -131,24 +128,23 @@
             return prks.push(placemark);
           }
         });
-        if (prks.length) {
-          return showPlacemarks(prks);
-        }
+        if (prks.length) return showPlacemarks(prks);
       });
     };
     createMap = function() {
       map = new YMaps.Map($("#map")[0]);
       map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
       map.enableScrollZoom();
+      map.addControl(new YMaps.Zoom({
+        noTips: true
+      }));
       map.addOverlay(gCollection);
       return YMaps.Events.observe(map, map.Events.BoundsChange, function(object) {
         return loadMap();
       });
     };
     findStation = function(search, setCenter) {
-      if (!search || (activePlacemark && activePlacemark.id === search)) {
-        return;
-      }
+      if (!search || (activePlacemark && activePlacemark.id === search)) return;
       startLoading();
       return OData.read("/Service/PresecService.svc/Stations('" + search + "')?$expand=near,boundary/matches,similar/lines/matches,foundBy/found/matches,foundBy/point,twins", function(data) {
         var activePrk, geo, pt;
@@ -201,13 +197,17 @@
       return findStation($("#search_field").val(), true);
     });
     LineModel = (function() {
+
       function LineModel(id, lines) {
         this.id = id;
         this.lines = lines;
       }
+
       return LineModel;
+
     })();
     ViewModel = (function() {
+
       function ViewModel() {
         this.id = ko.observable();
         this.key = ko.observable();
@@ -222,10 +222,13 @@
         this.similarToggle = ko.observable(false);
         this.nearToggle = ko.observable(false);
       }
+
       ViewModel.prototype.showStation = function(data) {
         return findStation(data.id(), true);
       };
+
       return ViewModel;
+
     })();
     ko.bindingHandlers.toggle = {
       init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -245,4 +248,5 @@
     createSelector();
     return setStartPoint();
   });
+
 }).call(this);

@@ -135,6 +135,9 @@
       map = new YMaps.Map($("#map")[0]);
       map.setCenter(new YMaps.GeoPoint(37.64, 55.76), 10);
       map.enableScrollZoom();
+      map.addControl(new YMaps.Zoom({
+        noTips: true
+      }));
       map.addOverlay(gCollection);
       return YMaps.Events.observe(map, map.Events.BoundsChange, function(object) {
         return loadMap();

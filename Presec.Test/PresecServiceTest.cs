@@ -250,7 +250,7 @@ namespace Presec.Test
             MapRegion actual = null;
             
             actual = target.GetOne("37.398300804197795;55.51375574905723;38.08494631201029;55.90144684501253;street");
-            Assert.AreEqual(2995, actual.coords.Count());
+            Assert.AreEqual(2912, actual.coords.Count());
 
             actual = target.GetOne("37.398300804197795;55.51375574905723;38.08494631201029;55.90144684501253;district");
             Assert.AreEqual(120, actual.coords.Count());
